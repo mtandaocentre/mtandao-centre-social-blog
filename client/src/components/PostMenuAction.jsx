@@ -1,4 +1,4 @@
-const PostMenuAction = () => {
+const PostMenuAction = ({post}) => {
   return (
     <div className=''>
         {/* - Add Action Title 
