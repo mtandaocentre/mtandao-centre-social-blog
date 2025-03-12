@@ -137,7 +137,7 @@ const SinglePostPage = () => {
          {/* - Add post menu action component 
              - Change position of PostMenuAction component 
          */}
-          <PostMenuAction />
+          <PostMenuAction post={data}/>
 
           {/* - Add categories title
               - Style categories heading
