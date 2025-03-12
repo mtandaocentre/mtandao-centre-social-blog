@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*Format css body*/
+body{
+    background-color: #1b1c1c;
+    color: #e0e0e0;
+    width: 100vw;
+    overflow-x: hidden;
+    font-family: Montserrat,sans-serif
+}
+
+/* Animation class */
+.animatedButton{
+    animation-duration: 10000ms;
+}
+
+/* Remove quill default styling */
+.ql-container{
+    border: none !important;
+}
+
+.ql-toolbar{
+    border: none !important;
+}
+
+.ql-editor{
+    border: none !important;
+}
