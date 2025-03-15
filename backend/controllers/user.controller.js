@@ -37,6 +37,8 @@ export const savePost = async (req, res) => {
         });
     };
 
-    res.status(200).json(isSaved? "Post Unsaved" : "Post Saved");
+    setTimeout(() => {
+        res.status(200).json(isSaved? "Post Unsaved" : "Post Saved");
+    }, 3000)
 
 }
