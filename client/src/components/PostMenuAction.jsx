@@ -104,12 +104,21 @@ const PostMenuAction = ({post}) => {
             >
                 <path 
                     d="M12 4C10.3 4 9 5.3 9 7v34l15-9 15 9V7c0-1.7-1.3-3-3-3H12z"
-                    fill= {isSaved? "#e0e0e0" : "none"}
+                    fill= {
+                        saveMutation.isPending 
+                            ? isSaved 
+                                ? "none" 
+                                : "#e0e0e0" 
+                            : isSaved 
+                                ? "#e0e0e0" 
+                                : "none"
+                            }
                     stroke="#e0e0e0"
                     strokeWidth="2"
                 />
             </svg>
             <span>Save this Post</span>
+            {saveMutation.isPending && <span className="text-xs">(Working...)</span>}
             </div>
         )}
 
