@@ -11,12 +11,16 @@ const PostMenuAction = ({post}) => {
     const navigate = useNavigate();
     
 
-    const { isPending, error, data: savedPosts } = useQuery({
+    const { 
+        isPending, 
+        error, 
+        data: savedPosts 
+    } = useQuery({
         
         queryKey: ["savedPosts"],
         queryFn: async () => {
 
-            const token = await getToken()
+            const token = await getToken();
             return axios.get(`${import.meta.env.VITE_API_URL}/users/saved`,{
             headers:{
                 Authorization: `Bearer ${token}`
@@ -25,6 +29,7 @@ const PostMenuAction = ({post}) => {
 
     });
 
+    const isAdmin = user?.publicMetadata?.role === "admin" || false;
     const isSaved = savedPosts?.data?.some((p) => p === post._id) || false;
 
     const deleteMutation = useMutation({
@@ -122,7 +127,7 @@ const PostMenuAction = ({post}) => {
             </div>
         )}
 
-        {user && post.user.username === user.username && (
+        {user && (post.user.username === user.username || isAdmin) && (
             <div 
                 className="flex items-center gap-2 py-2 text-sm cursor-pointer"
                 onClick={handleDelete}>
