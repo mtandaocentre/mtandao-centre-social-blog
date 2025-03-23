@@ -28,3 +28,17 @@ body{
 .ql-editor{
     border: none !important;
 }
+
+pre {
+    background-color: #e0e0e0;
+    color: #1b1c1c;
+    padding: 1em;
+    overflow-x: auto;
+    border-radius: 5px;
+    margin: 1em 0;
+}
+  
+code {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-size: 0.9em;
+}
