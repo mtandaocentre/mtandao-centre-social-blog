@@ -8,6 +8,38 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "timeago.js";
 import parse from "html-react-parser"
 
+// Transformation function to fix code blocks
+const transformCodeBlocks = (html) => {
+  if (!html) return "";
+  
+  // Create a DOM parser to convert the HTML string to a document
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  
+  // Find all containers for code blocks
+  const containers = doc.querySelectorAll(".ql-code-block-container");
+  
+  containers.forEach((container) => {
+    // Get all inner code block lines
+    const codeLines = container.querySelectorAll(".ql-code-block");
+    let codeText = "";
+    codeLines.forEach((line) => {
+      codeText += line.textContent + "\n";
+    });
+    
+    // Create a new <pre><code> structure
+    const pre = doc.createElement("pre");
+    const code = doc.createElement("code");
+    code.textContent = codeText.trim(); // remove trailing newline
+    pre.appendChild(code);
+    
+    // Replace the original container with the new pre element
+    container.parentNode.replaceChild(pre, container);
+  });
+  
+  return doc.body.innerHTML;
+};
+
 const fetchPosts = async (slug) => {
   const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
   return res.data;
@@ -87,7 +119,7 @@ const SinglePostPage = () => {
         {/* Text */}
         {/* Add and style content text */}
         <div className="lg:text-lg flex flex-col gap-6 text-justify">
-            {parse(data.content)}
+            {parse(transformCodeBlocks(data.content))}
         </div>
 
         {/* Menu */}
