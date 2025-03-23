@@ -1,6 +1,6 @@
 import { useAuth, useUser } from "@clerk/clerk-react"
-import 'react-quill-new/dist/quill.snow.css';
 import ReactQuill from "react-quill-new";
+import 'react-quill-new/dist/quill.snow.css';
 import { useMutation } from "@tanstack/react-query"
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -92,6 +92,42 @@ const WritePage = () => {
 
   };
 
+  //Custom tool bar react-quill
+  const modules = {
+    toolbar: [
+      [{ header: [1,2,3,4,5,6,false] }],
+      [{"font": []}],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [{"color": []}, {"background": []}],
+      [{"size": ["small", false, "large", "huge"]}],
+      [{list: "ordered"}, {list: "bullet"}, {"script": "sub"}, {"script": "super"}],
+      [{"indent": "-1"}, {"indent": "+1"}, {"align": []}],
+      ["link", "image", "video"],
+      [{"code-block": true}],
+      ["clean"]
+    ]
+  };
+
+  const formats = [
+    "header",
+    "font",
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "list",
+    "bullet",
+    "indent",
+    "link",
+    "image",
+    "color",
+    "code-block",
+    "video",
+    "script"
+  ]
+
   return (
     // Style root container
     <div 
@@ -179,6 +215,8 @@ const WritePage = () => {
             className="flex-1 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
             value={value} 
             onChange={setValue}
+            modules = {modules}
+            formats = {formats}
             readOnly={0 < progress && progress < 100}
           />
 
