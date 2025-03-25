@@ -4,7 +4,8 @@ import {
     getPost, 
     createPost,
     deletePost,
-    uploadAuth
+    uploadAuth,
+    featurePost
 } from "../controllers/post.controller.js";
 
 // Define router
@@ -25,6 +26,9 @@ router.post("/", createPost);
 
 // create delete method end point and use deletePost from post.conroller to delete a post
 router.delete("/:id", deletePost);
+
+// create featurePost method end point and use featurePost from post.conroller to feature a post
+router.patch("/feature", featurePost);
 
 // export default
 export default router
