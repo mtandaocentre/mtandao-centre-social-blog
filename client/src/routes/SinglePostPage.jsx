@@ -50,7 +50,7 @@ const SinglePostPage = () => {
   const {slug} = useParams();
 
   const { isPending, error, data } = useQuery({
-      queryKey: ["posts", slug],
+      queryKey: ["post", slug],
       queryFn: () => fetchPosts(slug),
   });
 
