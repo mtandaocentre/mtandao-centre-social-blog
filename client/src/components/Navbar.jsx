@@ -79,13 +79,21 @@ const Navbar = () => {
             <Link to="/">Trending</Link>
             <Link to="/">Most Popular</Link>
             <Link to="/">About</Link>
-            <Link to="/">
-              <button 
-                className="py-2 px-4 rounded-3xl bg-[#1b1c1c] text-[#e0e0e0]"
-              >
-              Login x
-              </button>
-            </Link>
+            
+            {/* If user is signed out, direct them to login page */}
+            <SignedOut>
+              <Link to="/login">
+                <button 
+                  className="py-2 px-4 rounded-3xl bg-[#e0e0e0] 
+                  text-[#1b1c1c]"
+                >
+                  Login x
+                </button>
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           </div>
 
         </div>
