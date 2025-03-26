@@ -84,8 +84,8 @@ const Navbar = () => {
             <SignedOut>
               <Link to="/login">
                 <button 
-                  className="py-2 px-4 rounded-3xl bg-[#e0e0e0] 
-                  text-[#1b1c1c]"
+                  className="py-2 px-4 rounded-3xl bg-[#1b1c1c]
+                  text-[#e0e0e0]"
                 >
                   Login x
                 </button>
