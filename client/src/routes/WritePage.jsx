@@ -33,9 +33,16 @@ const WritePage = () => {
     img && setValue(prev => prev + `<p><image src="${img.url}"/></p>`)
   },[img])
 
-   // Create useEffect for adding video
-   useEffect(() => {
-    video && setValue(prev => prev + `<p><iframe class="ql-video" src="${video.url}"/></p>`)
+  // Append inserted images/videos to the editor content
+  useEffect(() => {
+  if (img && img.url) {
+    setValue(prev => prev + `<p><img src="${img.url}" alt="content image"/></p>`);
+  }
+  }, [img]);
+
+  // Create useEffect for adding video
+  useEffect(() => {
+  video && setValue(prev => prev + `<p><iframe class="ql-video" src="${video.url}"/></p>`)
   },[video])
 
   // Use navigate hook
@@ -145,7 +152,10 @@ const WritePage = () => {
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
 
         {/* Call upload component */}
-        <Upload type="image" setProgress={setProgress} setData={setCover}>
+        <Upload type="image" setProgress={setProgress} setData={(data) => {
+          console.log("Cover upload response:", data);
+          setCover(data);
+        }}>
           {/* Add button for adding cover image */}
           {/* Style button */}
           <button 
@@ -155,6 +165,15 @@ const WritePage = () => {
             Add a cover image
           </button> 
         </Upload> 
+
+        {/* Cover image preview */}
+        {cover?.url && (
+          <img
+            src={cover.url}
+            alt="Cover Preview"
+            className="w-40 h-auto object-contain rounded-xl shadow-md"
+          />
+        )}
 
         {/* Add title */}
         <input 
