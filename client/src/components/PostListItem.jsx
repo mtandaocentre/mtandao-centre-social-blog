@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query"
 import Image from "./Image"
 import { Link} from "react-router-dom"
 import { format } from "timeago.js"
