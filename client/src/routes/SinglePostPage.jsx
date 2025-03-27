@@ -90,7 +90,7 @@ const SinglePostPage = () => {
 
           {/* - Add and style description 
               - made description short */}
-          <p className="text-[#e0e0e0] font-medium">
+          <p className="text-[#e0e0e0] font-medium w-full max-w">
             {data.desc}
           </p>
 
@@ -100,13 +100,14 @@ const SinglePostPage = () => {
         {/* - Add and style Image component
             - Add width and rounding to image
         */}
-        {data.img && <div className="hidden lg:block w-2/5">
-          <Image 
-            src={data.img}
-            w="600" 
-            className="rounded-2xl" 
-          />
-        </div>}
+        {data.img && (
+          <div className="hidden lg:block w-full max-w-[400px] ml-16">
+            <Image 
+              src={data.img}
+              className="rounded-2xl w-full"
+            />
+          </div>
+        )}
 
       </div>
 
