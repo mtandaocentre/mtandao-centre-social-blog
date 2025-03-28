@@ -1,6 +1,7 @@
 import ImageKit from "imagekit";
 import Post from "../models/post.model.js"
 import User from "../models/user.model.js"
+import View from "../models/view.model.js";
 
 // Declare and export getPosts to fetch many posts
 export const getPosts = async (req, res) => {
@@ -23,26 +24,54 @@ export const getPosts = async (req, res) => {
 }
 
 // Declare and export getPost to fetch single post
+// Update getPost algo to only count one post per day from user
 export const getPost = async (req, res) => {
     try {
-        const { slug } = req.params;
+      const { slug } = req.params;
+      const post = await Post.findOne({ slug }).populate("user", "username img description");
+  
+      if (!post) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+  
+      // Determine the unique identifier: logged in user or client IP
+      const userId = req.auth && req.auth.userId;
+      const ip = req.ip; // Make sure app.set('trust proxy', true) is set if behind a proxy
+  
+      // Define the start of the current day
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+  
+      // Check if this user/IP has already viewed the post today
+      const existingView = await View.findOne({
+        post: post._id,
+        viewedAt: { $gte: todayStart },
+        ...(userId ? { user: userId } : { ip }),
+      });
+  
+      // If not, increment the view count and record the view
+      if (!existingView) {
+        await Post.findOneAndUpdate(
+          { _id: post._id },
+          { $inc: { visit: 1 } }
+        );
+  
+        await new View({
+          post: post._id,
+          user: userId, // will be undefined if no user is logged in
+          ip: userId ? undefined : ip,
+        }).save();
 
-        // Find post by slug and increment visit count
-        const post = await Post.findOneAndUpdate(
-            { slug },
-            { $inc: { visit: 1 } },  // Increment visit count by 1
-            { new: true } // Ensure updated document is returned
-        ).populate("user", "username img description");
+        // Update the local post object so that it reflects the new view count
+        post.visit += 1;
 
-        if (!post) {
-            return res.status(404).json({ message: "Post not found" });
-        }
-
-        res.status(200).json(post);
+      }
+  
+      res.status(200).json(post);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
-};
+  };
 
 // Declare and export craetePost to create a post
 export const createPost = async (req, res) => {
