@@ -24,14 +24,25 @@ export const getPosts = async (req, res) => {
 
 // Declare and export getPost to fetch single post
 export const getPost = async (req, res) => {
-    
-    const post = await Post.findOne({ slug: req.params.slug }).populate(
-        "user",
-        "username img description"
-    );
-    res.status(200).send(post);
+    try {
+        const { slug } = req.params;
 
-}
+        // Find post by slug and increment visit count
+        const post = await Post.findOneAndUpdate(
+            { slug },
+            { $inc: { visit: 1 } },  // Increment visit count by 1
+            { new: true } // Ensure updated document is returned
+        ).populate("user", "username img description");
+
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        res.status(200).json(post);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 // Declare and export craetePost to create a post
 export const createPost = async (req, res) => {
