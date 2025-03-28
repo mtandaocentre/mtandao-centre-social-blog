@@ -42,3 +42,31 @@ export const savePost = async (req, res) => {
     }, 3000)
 
 }
+
+// New controller function to update user description
+export const updateUserDescription = async (req, res) => {
+    const clerkUserId = req.auth.userId;
+    const { description } = req.body;
+    // console.log("Updating description to:", description); // Debug log
+  
+    if (!clerkUserId) {
+      return res.status(401).json("Sign in to perform this action!");
+    }
+  
+    try {
+      const updatedUser = await User.findOneAndUpdate(
+        { clerkUserId },
+        { description },
+        { new: true }
+      );
+  
+      if (!updatedUser) {
+        return res.status(404).json("User not found!");
+      }
+  
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+
+  };
