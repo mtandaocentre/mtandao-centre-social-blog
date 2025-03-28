@@ -35,6 +35,12 @@ const userSchema = new Schema(
       type: [String],
       default: [],
     },
+
+    // Author description
+    description: {
+      type: String,
+      default: "",  // or use a default text if preferred
+    },
   },
 
   // Time created
