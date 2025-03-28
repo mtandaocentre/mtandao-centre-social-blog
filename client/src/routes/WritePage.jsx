@@ -51,24 +51,30 @@ const WritePage = () => {
   // Get token 
   const { getToken } = useAuth();
 
-  // Mutate data using useMutation
+  // Combined mutation for creating the post and updating user description
   const mutation = useMutation({
-    mutationFn: async (newPost) => {
+    mutationFn: async ({ data, authorDescription }) => {
       const token = await getToken();
-      return axios.post(`${import.meta.env.VITE_API_URL}/posts`, newPost, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const [postResponse, userDescResponse] = await Promise.all([
+        axios.post(`${import.meta.env.VITE_API_URL}/posts`, data, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.patch(
+          `${import.meta.env.VITE_API_URL}/users/description`,
+          { description: authorDescription },
+          { headers: { Authorization: `Bearer ${token}` } }
+        ),
+      ]);
+      return { postResponse, userDescResponse };
     },
-
-    // Use navigate to navigate to new article on success
-    // Add toast for success
-    onSuccess: (res) => {
-      toast.success("Your post has been created!");
-      navigate(`/${res.data.slug}`);
+    onSuccess: ({ postResponse }) => {
+      toast.success("Your post has been created successfully!");
+      navigate(`/${postResponse.data.slug}`);
     },
-
+    onError: (error) => {
+      toast.error("Something went wrong!");
+      console.error(error);
+    },
   });
 
   if(!isLoaded){
@@ -93,9 +99,12 @@ const WritePage = () => {
       content: value,
     };
 
-    console.log(data);
+    // console.log(data);
 
-    mutation.mutate(data);
+    const authorDescription = formData.get("authorDescription");
+
+    // Instead of calling mutation.mutate(data) directly, pass an object with both pieces of data
+    mutation.mutate({ data, authorDescription });
 
   };
 
@@ -211,7 +220,7 @@ const WritePage = () => {
         {/* Style description text area */}
         <textarea 
           name="desc" 
-          placeholder="Add a short description"
+          placeholder="Add a short description about the article you are writting..."
           className="p-4 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md" 
         />
 
@@ -231,7 +240,7 @@ const WritePage = () => {
           {/* Style quill */}
           <ReactQuill 
             theme="snow" 
-            className="flex-1 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
+            className="flex-1 h-[500px] rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
             value={value} 
             onChange={setValue}
             modules = {modules}
@@ -240,6 +249,13 @@ const WritePage = () => {
           />
 
         </div>
+
+         {/* New field for author description */}
+         <textarea
+          name="authorDescription"
+          placeholder="Add a short description about the author of the article..."
+          className="p-4 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
+        />
 
         {/* Add send button */}
         {/* Style send button */}
@@ -256,6 +272,8 @@ const WritePage = () => {
         {"Progress:" + progress}
         {/* { mutation.isError && <span>{mutation.error.message}</span> } */}
       </form>
+
+
     </div>
   )
 }
