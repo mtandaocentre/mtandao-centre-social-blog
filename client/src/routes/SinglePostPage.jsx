@@ -6,7 +6,8 @@ import Comments from "../components/Comments";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "timeago.js";
-import parse from "html-react-parser"
+import parse from "html-react-parser";
+import { FaEye } from "react-icons/fa";
 
 // Transformation function to fix code blocks
 const transformCodeBlocks = (html) => {
@@ -86,6 +87,15 @@ const SinglePostPage = () => {
             <span>on</span>
             <Link className="text-[#e0e0e0] font-semibold">{data.category}</Link>
             <span>{format(data.createdAt)}</span>
+            {/* Views Count */}
+            {/* Sexy Views Counter */}
+            <div 
+              className="flex items-center gap-1 bg-[#e0e0e0] px-3 py-1 rounded-full text-sm 
+              font-semibold text-[#1b1c1c]"
+            >
+              <FaEye className="w-4 h-4 opacity-80" />
+              <span>{data.visit} views</span>
+            </div>
           </div>
 
           {/* - Add and style description 
