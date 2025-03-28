@@ -10,6 +10,9 @@ import cors from "cors"
 // Create express app/server
 const app = express();
 
+// Set trust proxy at the very top
+app.set("trust proxy", true);
+
 // use cors middlewear to parse cliend url
 app.use(cors(process.env.CLIENT_URL));
 
