@@ -1,6 +1,7 @@
 import Image from "./Image"
 import { Link} from "react-router-dom"
 import { format } from "timeago.js"
+import { FaEye } from "react-icons/fa"  // Import the eye icon
 
 const PostListItem = ({post}) => {
   return (
@@ -34,6 +35,14 @@ const PostListItem = ({post}) => {
                 <Link className="text-[#e0e0e0] font-bold">{post.user.username}</Link>
                 <span>{format(post.createdAt)}</span>
                 <Link className="text-[#e0e0e0] font-bold">{post.category}</Link>
+                {/* Views Counter */}
+                <div 
+                    className="flex items-center gap-1 bg-[#e0e0e0] px-2 py-1 rounded-full 
+                    text-xs font-semibold text-[#1b1c1c]"
+                >
+                    <FaEye className="w-3 h-3 opacity-80" />
+                    <span>{post.visit} views</span>
+                </div>
             </div>
 
             <p>
