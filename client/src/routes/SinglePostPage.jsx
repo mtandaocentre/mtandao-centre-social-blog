@@ -151,9 +151,7 @@ const SinglePostPage = () => {
               {/* - Description 
                   - Style description */}
               <p className="text-sm font-medium">
-                  Lorem Ipsum is simply dummy text of the printing and 
-                  typesetting industry.  Lorem Ipsum is simply dummy text of the printing and 
-                  typesetting industry. 
+                {data.user.description || "No description available."}
               </p>
 
               {/* Add social media links */}
