@@ -56,6 +56,9 @@ const postSchema = new Schema(
       type: Number,
       default: 0,
     },
+
+    // Likes count
+    likes: [{ type: String }]
   },
 
   // record time created
