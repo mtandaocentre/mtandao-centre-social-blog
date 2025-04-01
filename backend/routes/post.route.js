@@ -5,7 +5,8 @@ import {
     createPost,
     deletePost,
     uploadAuth,
-    featurePost
+    featurePost,
+    likePost
 } from "../controllers/post.controller.js";
 
 // Define router
@@ -29,6 +30,9 @@ router.delete("/:id", deletePost);
 
 // create featurePost method end point and use featurePost from post.conroller to feature a post
 router.patch("/feature", featurePost);
+
+// Like a post
+router.post("/:postId/like", likePost);
 
 // export default
 export default router
