@@ -9,8 +9,19 @@ import axios from "axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "timeago.js";
 import parse from "html-react-parser";
-import { FaEye, FaHeart } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { 
+  FaEye, 
+  FaHeart, 
+  FaShareAlt,
+  FaFacebookF, 
+  FaTwitter, 
+  FaLinkedinIn, 
+  FaWhatsapp, 
+  FaTelegram, 
+  FaCopy  
+} from "react-icons/fa";
+
 
 // Transformation function to fix code blocks
 const transformCodeBlocks = (html) => {
@@ -53,6 +64,11 @@ const SinglePostPage = () => {
   const [hasLiked, setHasLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
+  // Track share count
+  const [shares, setShares] = useState(data?.shareCount || 0); 
+  // Add this state to control the share options menu:
+  const [showShareOptions, setShowShareOptions] = useState(false);
+
   // When data is fetched, update local state.
   useEffect(() => {
     if (data?.likes) {
@@ -61,6 +77,13 @@ const SinglePostPage = () => {
       setHasLiked(user?.id ? data.likes.includes(user.id) : false);
     }
   }, [data, user]);
+
+  // Update share count when data changes.
+  useEffect(() => {
+    if (data) {
+      setShares(data.shareCount);
+    }
+  }, [data]);
 
   const handleLike = async () => {
     if (!user) {
@@ -127,6 +150,79 @@ const SinglePostPage = () => {
     } finally {
       setIsLiking(false);
     }
+  };
+
+  const handleShare = async () => {
+    // Only allow sharing if the user is logged in
+    if (!user) {
+      alert("You must be logged in to share a post.");
+      return;
+    }
+  
+    try {
+      const token = await getToken();
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/posts/${data._id}/increment-share`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      // Update the UI share count after successful share
+      setShares((prev) => prev + 1);
+    } catch (error) {
+      console.error("Error sharing post:", error);
+    }
+  
+    // Toggle the share options menu for logged-in users
+    setShowShareOptions(!showShareOptions);
+  };
+
+  // Helper function to copy the link:
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      alert("Link copied to clipboard!");
+    } catch (error) {
+      console.error("Failed to copy link:", error);
+    }
+    // Hide the share options menu after copying link
+    setShowShareOptions(false);
+  };
+  
+  // Helper function to open the share URL:
+  const shareOnSocialMedia = (platform) => {
+    const postUrl = encodeURIComponent(window.location.href);
+    const postTitle = encodeURIComponent(data.title);
+    let shareUrl = "";
+    
+    switch (platform) {
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${postUrl}`;
+        break;
+      case "twitter":
+        shareUrl = `https://twitter.com/intent/tweet?url=${postUrl}&text=${postTitle}`;
+        break;
+      case "linkedin":
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${postUrl}`;
+        break;
+      case "whatsapp":
+        shareUrl = `https://api.whatsapp.com/send?text=${postTitle}%20${postUrl}`;
+        break;
+      case "telegram":
+        shareUrl = `https://t.me/share/url?url=${postUrl}&text=${postTitle}`;
+        break;
+      default:
+        return;
+    }
+    
+    window.open(shareUrl, "_blank", "noopener,noreferrer");
+    // Hide the share options menu after selecting a platform
+    setShowShareOptions(false);
   };
 
   if (isPending) return "Loading...";
@@ -205,23 +301,83 @@ const SinglePostPage = () => {
         </div>
       </div>
       
-      {/* Like Button */}
-      <button
-        onClick={handleLike}
-        className="inline-flex items-center gap-2 bg-[#e0e0e0] px-3 py-1 rounded-full text-sm font-semibold text-[#1b1c1c] transition duration-200 hover:bg-gray-300 max-w-fit"
-        disabled={isLiking}
-      >
-        <motion.div
-          animate={{ scale: hasLiked ? 1.3 : 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 10 }}
+      {/* Like & Share Button Container */}
+      <div className="flex justify-between items-center mt-6 w-full md:w-3/5">
+        {/* Like Button */}
+        <button
+          onClick={handleLike}
+          className="inline-flex items-center gap-2 bg-[#e0e0e0] px-3 py-1 rounded-full text-sm font-semibold text-[#1b1c1c] transition duration-200 hover:bg-gray-300 max-w-fit"
+          disabled={isLiking}
         >
-          <FaHeart
-            className="w-4 h-4 opacity-80"
-            style={{ color: hasLiked ? "red" : "#1b1c1c" }}
-          />
-        </motion.div>
-        <span>{likes}</span>
-      </button>
+          <motion.div
+            animate={{ scale: hasLiked ? 1.3 : 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 10 }}
+          >
+            <FaHeart
+              className="w-4 h-4 opacity-80"
+              style={{ color: hasLiked ? "red" : "#1b1c1c" }}
+            />
+          </motion.div>
+          <span>{likes}</span>
+        </button>
+
+        {/* Share Button */}
+        <button
+          onClick={handleShare}
+          className="inline-flex items-center gap-2 bg-blue-500 px-3 py-1 rounded-full text-white text-sm font-semibold shadow-lg hover:bg-blue-600 transition duration-200"
+        >
+          <FaShareAlt className="w-4 h-4" />
+          <span>{shares}</span>
+        </button>
+      </div>
+
+      {/* Social Media Share Options Menu */}
+      {showShareOptions && (
+        <div className="flex flex-wrap gap-2 mt-4 w-full md:w-3/5">
+          <button
+            onClick={() => shareOnSocialMedia("facebook")}
+            className="inline-flex items-center gap-2 bg-[#1877f2] px-4 py-2 rounded-full text-white text-sm font-semibold shadow-lg hover:bg-[#145db2] transition duration-200"
+          >
+            <FaFacebookF className="w-4 h-4" />
+            <span>Facebook</span>
+          </button>
+          <button
+            onClick={() => shareOnSocialMedia("twitter")}
+            className="inline-flex items-center gap-2 bg-[#1da1f2] px-4 py-2 rounded-full text-white text-sm font-semibold shadow-lg hover:bg-[#0d8ae6] transition duration-200"
+          >
+            <FaTwitter className="w-4 h-4" />
+            <span>Twitter</span>
+          </button>
+          <button
+            onClick={() => shareOnSocialMedia("linkedin")}
+            className="inline-flex items-center gap-2 bg-[#0077b5] px-4 py-2 rounded-full text-white text-sm font-semibold shadow-lg hover:bg-[#005582] transition duration-200"
+          >
+            <FaLinkedinIn className="w-4 h-4" />
+            <span>LinkedIn</span>
+          </button>
+          <button
+            onClick={() => shareOnSocialMedia("whatsapp")}
+            className="inline-flex items-center gap-2 bg-[#25d366] px-4 py-2 rounded-full text-white text-sm font-semibold shadow-lg hover:bg-[#1da851] transition duration-200"
+          >
+            <FaWhatsapp className="w-4 h-4" />
+            <span>WhatsApp</span>
+          </button>
+          <button
+            onClick={() => shareOnSocialMedia("telegram")}
+            className="inline-flex items-center gap-2 bg-[#0088cc] px-4 py-2 rounded-full text-white text-sm font-semibold shadow-lg hover:bg-[#006C8B] transition duration-200"
+          >
+            <FaTelegram className="w-4 h-4" />
+            <span>Telegram</span>
+          </button>
+          <button
+            onClick={handleCopyLink}
+            className="inline-flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-full text-white text-sm font-semibold shadow-lg hover:bg-gray-700 transition duration-200"
+          >
+            <FaCopy className="w-4 h-4" />
+            <span>Copy Link</span>
+          </button>
+        </div>
+      )}
 
       {/* Comments */}
       <Comments postId={data._id} />
