@@ -31,7 +31,7 @@ const MainCategories = () => {
                 className="hover:bg-[#737373] text-[#1b1c1c] rounded-full
                 px-4 py-2"
             >
-                AI
+                AIoT
             </Link>
 
             <Link to="/posts?cat=cloud" 
@@ -55,13 +55,6 @@ const MainCategories = () => {
                 Hardware
             </Link>
 
-            <Link to="/posts?cat=iot" 
-                className="hover:bg-[#737373] text-[#1b1c1c] rounded-full
-                px-4 py-2"
-            >
-                IoT
-            </Link>
-
             <Link to="/posts?cat=security" 
                 className="hover:bg-[#737373] text-[#1b1c1c] rounded-full
                 px-4 py-2"
@@ -80,15 +73,9 @@ const MainCategories = () => {
                 className="hover:bg-[#737373] text-[#1b1c1c] rounded-full
                 px-4 py-2"
             >
-                Web2
+                Web
             </Link>
 
-            <Link to="/posts?cat=web3" 
-                className="hover:bg-[#737373] text-[#1b1c1c] rounded-full
-                px-4 py-2"
-            >
-                Web3
-            </Link>
         </div>
 
         {/* Add seperater */}
