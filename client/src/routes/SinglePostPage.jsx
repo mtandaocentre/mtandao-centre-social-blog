@@ -236,16 +236,17 @@ const SinglePostPage = () => {
         <div className="lg:w-3/5 flex flex-col gap-8">
           <h1 className="text-xl md:text-3xl xl:text-4xl 2xl:text-5xl font-bold">{data.title}</h1>
           <div className="flex items-center gap-2 text-[#e0e0e0] text-sm">
+            <Link className="text-[#e0e0e0] font-semibold">{data.category}</Link>
             <span>Written by</span>
             <Link className="text-[#e0e0e0] font-semibold">{data.user.username}</Link>
             <span>on</span>
-            <Link className="text-[#e0e0e0] font-semibold">{data.category}</Link>
             <span>{format(data.createdAt)}</span>
             <div className="flex items-center gap-1 bg-[#e0e0e0] px-3 py-1 rounded-full text-sm font-semibold text-[#1b1c1c]">
               <FaEye className="w-4 h-4 opacity-80" />
               <span>{data.visit} views</span>
             </div>
           </div>
+
           <p className="text-[#e0e0e0] font-medium w-full max-w">{data.desc}</p>
         </div>
 
@@ -287,14 +288,13 @@ const SinglePostPage = () => {
           <h1 className="mt-8 mb-4 text-sm font-medium">Categories</h1>
           <div className="flex flex-col gap-2 text-sm">
             <Link className="underline">All Posts</Link>
-            <Link className="underline">AI</Link>
+            <Link className="underline">AIoT</Link>
             <Link className="underline">Cloud</Link>
             <Link className="underline">Data</Link>
             <Link className="underline">Hardware</Link>
-            <Link className="underline">IoT</Link>
             <Link className="underline">Security</Link>
             <Link className="underline">Software</Link>
-            <Link className="underline">Web3</Link>
+            <Link className="underline">Web</Link>
           </div>
           <h1 className="mt-8 mb-4 text-sm font-medium">Search</h1>
           <Search />
