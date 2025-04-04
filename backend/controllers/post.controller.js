@@ -174,41 +174,61 @@ export const uploadAuth = async (req, res) => {
 // LIKE POST
 // ---------------------
 export const likePost = async (req, res) => {
-    try {
-      // Get the Clerk user ID directly from req.auth
-      const clerkUserId = req.auth?.userId;
-      if (!clerkUserId) {
-        return res.status(401).json({ message: "Not authenticated!" });
-      }
-  
-      // Use 'postId' from params.
-      const { postId } = req.params;
-      if (!postId) {
-        return res.status(400).json({ message: "Missing postId" });
-      }
-  
-      const post = await Post.findById(postId);
-      if (!post) {
-        return res.status(404).json({ message: "Post not found" });
-      }
-  
-      // Check if the Clerk user ID is already in the likes array.
-      const hasLiked = post.likes.includes(clerkUserId);
-  
-      if (hasLiked) {
-        // Remove the like if already liked.
-        post.likes = post.likes.filter((id) => id !== clerkUserId);
-      } else {
-        // Add the Clerk user ID to the likes array.
-        post.likes.push(clerkUserId);
-      }
-  
-      await post.save();
-  
-      // Respond with the new likes count and liked status.
-      res.status(200).json({ likes: post.likes.length, liked: !hasLiked });
-    } catch (error) {
-      console.error("Error in likePost:", error);
-      res.status(500).json({ message: "Error processing like", error: error.message });
+  try {
+    // Get the Clerk user ID directly from req.auth
+    const clerkUserId = req.auth?.userId;
+    if (!clerkUserId) {
+      return res.status(401).json({ message: "Not authenticated!" });
     }
-  };
+
+    // Use 'postId' from params.
+    const { postId } = req.params;
+    if (!postId) {
+      return res.status(400).json({ message: "Missing postId" });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Check if the Clerk user ID is already in the likes array.
+    const hasLiked = post.likes.includes(clerkUserId);
+
+    if (hasLiked) {
+      // Remove the like if already liked.
+      post.likes = post.likes.filter((id) => id !== clerkUserId);
+    } else {
+      // Add the Clerk user ID to the likes array.
+      post.likes.push(clerkUserId);
+    }
+
+    await post.save();
+
+    // Respond with the new likes count and liked status.
+    res.status(200).json({ likes: post.likes.length, liked: !hasLiked });
+  } catch (error) {
+    console.error("Error in likePost:", error);
+    res.status(500).json({ message: "Error processing like", error: error.message });
+  }
+};
+
+// ---------------------
+// INCREMENT SHARE COUNT
+// ---------------------
+export const incrementShare = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      { $inc: { shareCount: 1 } },
+      { new: true }
+    );
+    if (!updatedPost) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    res.status(200).json({ message: "Share count updated", shareCount: updatedPost.shareCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
