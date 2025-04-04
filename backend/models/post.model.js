@@ -58,7 +58,13 @@ const postSchema = new Schema(
     },
 
     // Likes count
-    likes: [{ type: String }]
+    likes: [{ type: String }],
+    
+    // Share count
+    shareCount: {
+      type: Number,
+      default: 0, // Default share count is 0
+    }
   },
 
   // record time created
