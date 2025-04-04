@@ -31,10 +31,12 @@ const PostListItem = ({post}) => {
             </Link>
             
             <div className="flex items-center gap-2 text-[#e0e0e0]">
+                
+                <Link className="text-[#e0e0e0] font-bold">{post.category}</Link>
                 <span>Written by</span>
                 <Link className="text-[#e0e0e0] font-bold">{post.user.username}</Link>
                 <span>{format(post.createdAt)}</span>
-                <Link className="text-[#e0e0e0] font-bold">{post.category}</Link>
+                
                 {/* Views Counter */}
                 <div 
                     className="flex items-center gap-1 bg-[#e0e0e0] px-2 py-1 rounded-full 
@@ -43,6 +45,7 @@ const PostListItem = ({post}) => {
                     <FaEye className="w-3 h-3 opacity-80" />
                     <span>{post.visit} views</span>
                 </div>
+                
             </div>
 
             <p>
