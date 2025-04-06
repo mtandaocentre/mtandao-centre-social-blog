@@ -1,16 +1,32 @@
 import { useState } from "react"
 import PostList from "../components/PostList"
 import SideMenu from "../components/SideMenu"
+import { useLocation } from "react-router-dom"
 
 const PostListPage = () => {
 
   // Use stae hook to handle button on small screens
   const [open,setOpen] = useState(false)
+  const location = useLocation();
+
+  // Extract category from query string
+  const queryParams = new URLSearchParams(location.search)
+  const categoryParam = queryParams.get("cat")
+
+  // Format the category title (capitalize first letter)
+  const formatCategoryTitle = (cat) => {
+    if (!cat) return "All Posts"
+    return cat.charAt(0).toUpperCase() + cat.slice(1)
+  }
 
   return (
     <div className=''>
       {/* Add page title */}
-      <h1 className="mb-8 text-2xl">Category Blog</h1>
+      <h1 
+        className="mb-8 text-2xl"
+      >
+        {formatCategoryTitle(categoryParam)}
+      </h1>
 
       {/* Small screen side menu button */}
       <button 
@@ -26,7 +42,7 @@ const PostListPage = () => {
 
         {/* Add PostList component */}
         <div className="">
-          <PostList />
+          <PostList category={categoryParam || "all"}/>
         </div>
 
         {/* Add SideMenu Component */}
