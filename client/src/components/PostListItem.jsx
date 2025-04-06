@@ -23,7 +23,7 @@ const PostListItem = ({post}) => {
 
         {/* Details */}
         {/* - Add title and by line
-            - Add destcription and read more link 
+            - Add destcription and read more link {post}
         */}
         <div className="flex flex-col gap-4 xl:w-2/3">
             <Link to={`/${post.slug}`} className="text-4xl font-semibold">
@@ -32,9 +32,19 @@ const PostListItem = ({post}) => {
             
             <div className="flex items-center gap-2 text-[#e0e0e0]">
                 
-                <Link className="text-[#e0e0e0] font-bold">{post.category}</Link>
+                <Link 
+                    className="text-[#e0e0e0] font-bold"
+                    to={`/posts?cat=${post.category}`}
+                >
+                    {post.category}
+                </Link>
                 <span>Written by</span>
-                <Link className="text-[#e0e0e0] font-bold">{post.user.username}</Link>
+                <Link 
+                    className="text-[#e0e0e0] font-bold" 
+                    to={`/posts?author=${post.user.username}`}
+                >
+                    {post.user.username}
+                </Link>
                 <span>{format(post.createdAt)}</span>
                 
                 {/* Views Counter */}
