@@ -1,7 +1,21 @@
 import Search from "./Search"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 
 const SideMenu = () => {
+
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const handleFilterChange = (e) =>{
+
+        if(searchParams.get("sort") !== e.target.value) {
+            setSearchParams({
+                ...Object.fromEntries(searchParams.entries()),
+                sort:e.target.value,
+            })
+        }
+ 
+    }
+
   return (
     // Make menu sticky during scroll
     <div className='px-4 h-max sticky top-8 mb-4'>
@@ -21,6 +35,7 @@ const SideMenu = () => {
                     <input 
                         type="radio" 
                         name="sort" 
+                        onChange={handleFilterChange}
                         value="newest" 
                         className="appearance-none w-4 h-4 border-[1.5px] 
                         border-[#e0e0e0] cursor-pointer rounded-sm
@@ -35,6 +50,7 @@ const SideMenu = () => {
                     <input 
                         type="radio" 
                         name="sort" 
+                        onChange={handleFilterChange}
                         value="popular" 
                         className="appearance-none w-4 h-4 border-[1.5px] 
                         border-[#e0e0e0] cursor-pointer rounded-sm
@@ -49,6 +65,7 @@ const SideMenu = () => {
                     <input 
                         type="radio" 
                         name="sort" 
+                        onChange={handleFilterChange}
                         value="trending" 
                         className="appearance-none w-4 h-4 border-[1.5px] 
                         border-[#e0e0e0] cursor-pointer rounded-sm
@@ -63,6 +80,7 @@ const SideMenu = () => {
                     <input 
                         type="radio" 
                         name="sort" 
+                        onChange={handleFilterChange}
                         value="oldest" 
                         className="appearance-none w-4 h-4 border-[1.5px] 
                         border-[#e0e0e0] cursor-pointer rounded-sm
