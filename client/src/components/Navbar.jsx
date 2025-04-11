@@ -18,7 +18,9 @@ const Navbar = () => {
   // Test token using useEffect
   useEffect(() => {
     getToken().then((token) => console.log(token));
-  },[])
+  },[getToken])
+
+  const navLinkStyle = "hover:text-[#5f5f5f] transition-colors duration-200";
   
   return (
     /* Format the Navbar container */
@@ -75,10 +77,10 @@ const Navbar = () => {
             ${ open ? "-right-0" : "-right-[100%]"}`
           } 
           >
-            <Link to="/">Home</Link>
-            <Link to="/">Trending</Link>
-            <Link to="/">Most Popular</Link>
-            <Link to="/">About</Link>
+            <Link to="/" className={navLinkStyle}>Home</Link>
+            <Link to="/posts?sort=trending" className={navLinkStyle}>Trending</Link>
+            <Link to="/posts?sort=popular" className={navLinkStyle}>Most Popular</Link>
+            <Link to="/" className={navLinkStyle}>About</Link>
             
             {/* If user is signed out, direct them to login page */}
             <SignedOut>
@@ -105,10 +107,10 @@ const Navbar = () => {
             - Change font to bold
         */}
         <div className="hidden md:flex gap-8 xl:gap-12 font-bold">
-          <Link to="/">Home</Link>
-          <Link to="/">Trending</Link>
-          <Link to="/">Most Popular</Link>
-          <Link to="/">About</Link>
+          <Link to="/" className={navLinkStyle}>Home</Link>
+          <Link to="/posts?sort=trending" className={navLinkStyle}>Trending</Link>
+          <Link to="/posts?sort=popular" className={navLinkStyle}>Most Popular</Link>
+          <Link to="/" className={navLinkStyle}>About</Link>
           
           {/* If user is signed out, direct them to login page */}
           <SignedOut>
