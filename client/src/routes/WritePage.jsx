@@ -204,13 +204,13 @@ const WritePage = () => {
             shadow-md"
           >
             <option value="general">General</option>
-            <option value="ai">AIoT</option>
+            <option value="aiot">AIoT</option>
             <option value="cloud">Cloud</option>
             <option value="data">Data</option>
             <option value="hardware">Hardware</option>
             <option value="security">Security</option>
             <option value="software">Software</option>
-            <option value="web2">Web</option>
+            <option value="web">Web</option>
           </select>
         </div>
 
