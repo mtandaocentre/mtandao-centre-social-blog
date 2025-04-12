@@ -1,5 +1,5 @@
 import Search from "./Search"
-import { Link, useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router-dom"
 
 const SideMenu = () => {
 
@@ -15,6 +15,18 @@ const SideMenu = () => {
         }
  
     }
+
+    const handleCategoryChange = (category) => {
+        const currentParams = Object.fromEntries(searchParams.entries());
+    
+        if (category === "all posts") {
+            delete currentParams.cat; // remove the category filter
+        } else {
+            currentParams.cat = category;
+        }
+    
+        setSearchParams(currentParams);
+    };
 
   return (
     // Make menu sticky during scroll
@@ -95,16 +107,70 @@ const SideMenu = () => {
         <h1 className="mt-8 mb-4 text-sm font-medium">Categories</h1>
         {/* Add categories container  */}
         <div className="flex flex-col gap-2 text-sm">
-            <Link className="underline" to="/posts">All</Link>
-            <Link className="underline" to="/posts?cat=ai">AI</Link>
-            <Link className="underline" to="/posts?cat=cloud">Cloud</Link>
-            <Link className="underline" to="/posts?cat=data">Data</Link>
-            <Link className="underline" to="/posts?cat=hardware">Hardware</Link>
-            <Link className="underline" to="/posts?cat=iot">IoT</Link>
-            <Link className="underline" to="/posts?cat=security">Security</Link>
-            <Link className="underline" to="/posts?cat=software">Software</Link>
-            <Link className="underline" to="/posts?cat=web2">Web2</Link>
-            <Link className="underline" to="/posts?cat=web3">Web3</Link>
+            
+            <span 
+                className="underline cursor-pointer" 
+                onClick={()=>handleCategoryChange("all posts")}
+            >
+                All Posts
+            </span>
+
+            <span 
+                className="underline cursor-pointer" 
+                onClick={()=>handleCategoryChange("aiot")}
+            >
+                AIoT
+            </span>
+
+            <span 
+                className="underline cursor-pointer" 
+                onClick={()=>handleCategoryChange("cloud")}
+            >
+                Cloud
+            </span>
+
+            <span 
+                className="underline cursor-pointer" 
+                onClick={()=>handleCategoryChange("data")}
+            >
+                Data
+            </span>
+
+            <span 
+                className="underline cursor-pointer" 
+                onClick={()=>handleCategoryChange("general")}
+            >
+                General
+            </span>
+
+            <span 
+                className="underline cursor-pointer" 
+                onClick={()=>handleCategoryChange("hardware")}
+            >
+                Hardware
+            </span>
+
+            <span 
+                className="underline cursor-pointer" 
+                onClick={()=>handleCategoryChange("security")}
+            >
+                Security
+            </span>
+
+            <span 
+                className="underline cursor-pointer" 
+                onClick={()=>handleCategoryChange("software")}
+            >
+                Software
+            </span>
+
+            <span 
+                className="underline cursor-pointer" 
+                onClick={()=>handleCategoryChange("web")}
+            >
+                Web
+            </span>
+
         </div>
     </div>
   )
