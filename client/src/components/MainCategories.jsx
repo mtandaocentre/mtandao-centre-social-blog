@@ -28,7 +28,8 @@ const MainCategories = () => {
                 - Added new categories 
                 - Added Data, IoT and Web3 categories 
             */}
-            <Link to="/posts?cat=ai" 
+          
+            <Link to="/posts?cat=aiot" 
                 className="hover:bg-[#737373] text-[#1b1c1c] rounded-full
                 px-4 py-2"
             >
@@ -47,6 +48,13 @@ const MainCategories = () => {
                 px-4 py-2"
             >
                 Data
+            </Link>
+
+            <Link to="/posts?cat=general" 
+                className="hover:bg-[#737373] text-[#1b1c1c] rounded-full
+                px-4 py-2"
+            >
+                General
             </Link>
 
             <Link to="/posts?cat=hardware" 
@@ -70,7 +78,7 @@ const MainCategories = () => {
                 Software
             </Link>
 
-            <Link to="/posts?cat=web2" 
+            <Link to="/posts?cat=web" 
                 className="hover:bg-[#737373] text-[#1b1c1c] rounded-full
                 px-4 py-2"
             >
