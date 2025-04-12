@@ -287,14 +287,15 @@ const SinglePostPage = () => {
           <PostMenuAction post={data} />
           <h1 className="mt-8 mb-4 text-sm font-medium">Categories</h1>
           <div className="flex flex-col gap-2 text-sm">
-            <Link className="underline">All Posts</Link>
-            <Link className="underline">AIoT</Link>
-            <Link className="underline">Cloud</Link>
-            <Link className="underline">Data</Link>
-            <Link className="underline">Hardware</Link>
-            <Link className="underline">Security</Link>
-            <Link className="underline">Software</Link>
-            <Link className="underline">Web</Link>
+            <Link className="underline" to="/posts">All Posts</Link>
+            <Link className="underline" to="/posts?cat=aiot">AIoT</Link>
+            <Link className="underline" to="/posts?cat=cloud">Cloud</Link>
+            <Link className="underline" to="/posts?cat=data">Data</Link>
+            <Link className="underline" to="/posts?cat=general">General</Link>
+            <Link className="underline" to="/posts?cat=hardware">Hardware</Link>
+            <Link className="underline" to="/posts?cat=security">Security</Link>
+            <Link className="underline" to="/posts?cat=software">Software</Link>
+            <Link className="underline" to="/posts?cat=web">Web</Link>
           </div>
           <h1 className="mt-8 mb-4 text-sm font-medium">Search</h1>
           <Search />
