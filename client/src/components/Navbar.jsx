@@ -1,135 +1,172 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "./Image";
 import { Link } from "react-router-dom";
-import { 
-  SignedIn, 
-  SignedOut, 
-  useAuth, 
-  UserButton 
+import {
+  SignedIn,
+  SignedOut,
+  useAuth,
+  useUser,
+  SignOutButton,
 } from "@clerk/clerk-react";
 
 const Navbar = () => {
-  // Create useState hook to handle the opening and closing of mobile menu
   const [open, setOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null); // Ref for the dropdown menu
 
-  // Get authentication token from react app using useAuth
   const { getToken } = useAuth();
+  const { user } = useUser();
 
-  // Test token using useEffect
   useEffect(() => {
     getToken().then((token) => console.log(token));
-  },[getToken])
+  }, [getToken]);
+
+  // Close dropdown if click is outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const navLinkStyle = "hover:text-[#5f5f5f] transition-colors duration-200";
-  
+
   return (
-    /* Format the Navbar container */
-    <div className='w-full h-16 md:h-20 flex items-center justify-between'>
-        
-        {/* Add logo */}
-        {/* - Add styling to logo  
-            - Add text span and style it 
-            - Source image from imagekit CDN
-            - Change image source to Image component 
-            - Give logo and title a link leading to home page
-        */}
-        <Link to="/" 
-          className="flex items-center gap-4 text-2xl font-bold"
+    <div className="w-full h-16 md:h-20 flex items-center justify-between px-4 relative">
+      {/* Logo */}
+      <Link to="/" className="flex items-center gap-4 text-2xl font-bold">
+        <Image src="mtandao-logo.png" alt="Mtandao logo" w={32} h={32} />
+        <span>mtandao centre</span>
+      </Link>
+
+      {/* MOBILE MENU */}
+      <div className="md:hidden">
+        <div
+          className="cursor-pointer text-4xl"
+          onClick={() => setOpen((prev) => !prev)}
         >
-            <Image 
-              src="mtandao-logo.png" 
-              alt="Mtandao logo" 
-              w={32} 
-              h={32} 
-            />       
-            <span>mtandao centre</span>
-        </Link>
-
-        {/*MOBILE*/}
-        {/*Add responsivenes for mobile screen*/}
-        <div className="md:hidden">
-
-          {/* MOBILE BUTTON */}
-          {/* 
-              - Create an opening and closing button for the mobile menu
-              - Add onClick functionality  
-          */}
-          <div 
-            className="cursor-pointer text-4xl" 
-            onClick={()=>setOpen((prev)=>!prev)
-          }>
-            {/* Added triple bar */}
-            {open ? "X" : "≡" }
-          </div>
-
-          {/* MOBILE LINK LIST */}
-          {/* - Add styling to mobile link list
-              - Add animation to mobile link list 
-              - Add transition and speed to animation
-              - Added and styled links
-              - Change mobile links from anchor tags to Links 
-          */}
-          <div 
-            className={`w-full h-screen flex flex-col 
-            items-center justify-center gap-8 font-medium 
-            text-lg absolute top-16 bg-[#e0e0e0] text-[#1b1c1c] 
-            transition-all ease-in-out
-            ${ open ? "-right-0" : "-right-[100%]"}`
-          } 
-          >
-            <Link to="/" className={navLinkStyle}>Home</Link>
-            <Link to="/posts?sort=trending" className={navLinkStyle}>Trending</Link>
-            <Link to="/posts?sort=popular" className={navLinkStyle}>Most Popular</Link>
-            <Link to="/" className={navLinkStyle}>About</Link>
-            
-            {/* If user is signed out, direct them to login page */}
-            <SignedOut>
-              <Link to="/login">
-                <button 
-                  className="py-2 px-4 rounded-3xl bg-[#1b1c1c]
-                  text-[#e0e0e0]"
-                >
-                  Login x
-                </button>
-              </Link>
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </div>
-
+          {open ? "X" : "≡"}
         </div>
-
-        {/* DESKTOP */}
-        {/* - Add responsivenes for desktop screens
-            - Add Navbar links
-            - Change desktop links from anchor tags to Links 
-            - Change font to bold
-        */}
-        <div className="hidden md:flex gap-8 xl:gap-12 font-bold">
+        <div
+          className={`w-full h-screen flex flex-col 
+            items-center justify-center gap-8 font-medium 
+            text-lg absolute top-16 left-0 bg-[#e0e0e0] text-[#1b1c1c] 
+            transition-all ease-in-out z-20
+            ${open ? "translate-x-0" : "-translate-x-full"}`}
+        >
           <Link to="/" className={navLinkStyle}>Home</Link>
           <Link to="/posts?sort=trending" className={navLinkStyle}>Trending</Link>
           <Link to="/posts?sort=popular" className={navLinkStyle}>Most Popular</Link>
           <Link to="/" className={navLinkStyle}>About</Link>
-          
-          {/* If user is signed out, direct them to login page */}
+
           <SignedOut>
             <Link to="/login">
-              <button 
-                className="py-2 px-4 rounded-3xl bg-[#e0e0e0] 
-                text-[#1b1c1c]"
-              >
-                Login x
+              <button className="py-2 px-4 rounded-3xl bg-[#1b1c1c] text-[#e0e0e0]">
+                Login
               </button>
             </Link>
           </SignedOut>
+
           <SignedIn>
-            <UserButton />
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-2"
+            >
+              <img
+                src={user?.imageUrl}
+                alt="user"
+                className="w-8 h-8 rounded-full"
+              />
+              <span className="text-base font-semibold text-[#e0e0e0]">
+                {user?.firstName}
+              </span>
+            </button>
+
+            {dropdownOpen && (
+              <div ref={dropdownRef} className="mt-4 bg-[#d1cfcf] shadow-xl rounded-lg p-4 w-40">
+                
+                <Link
+                  to="/profile"
+                  onClick={() => setDropdownOpen(false)}
+                  className="block text-sm py-1 px-2 rounded-md text-[#6e6e6e] hover:text-[#1b1c1c] transition-colors duration-200"
+                >
+                  Profile
+                </Link>
+
+                <SignOutButton>
+                  <button className="block w-full text-left text-sm py-1 px-2 rounded-md text-[#6e6e6e] hover:text-[#1b1c1c] transition-colors duration-200">
+                    Logout
+                  </button>
+                </SignOutButton>
+
+              </div>
+            )}
           </SignedIn>
         </div>
+      </div>
 
+      {/* DESKTOP MENU */}
+      <div className="hidden md:flex items-center gap-8 xl:gap-12 font-bold">
+        <Link to="/" className={navLinkStyle}>Home</Link>
+        <Link to="/posts?sort=trending" className={navLinkStyle}>Trending</Link>
+        <Link to="/posts?sort=popular" className={navLinkStyle}>Most Popular</Link>
+        <Link to="/" className={navLinkStyle}>About</Link>
+
+        <SignedOut>
+          <Link to="/login">
+            <button className="py-2 px-4 rounded-3xl bg-[#e0e0e0] text-[#1b1c1c]">
+              Login
+            </button>
+          </Link>
+        </SignedOut>
+
+        <SignedIn>
+          <div className="relative">
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-2"
+            >
+              <img
+                src={user?.imageUrl}
+                alt="user"
+                className="w-8 h-8 rounded-full"
+              />
+              <span className="text-base font-semibold text-[#e0e0e0] md:text-lg">
+                {user?.firstName}
+              </span>
+            </button>
+
+            {dropdownOpen && (
+              <div ref={dropdownRef} className="absolute right-0 mt-2 bg-[#d1cfcf] shadow-lg rounded-lg p-3 w-40 z-30">
+              
+                <Link
+                  to="/profile"
+                  onClick={() => setDropdownOpen(false)}
+                  className="block text-sm py-1 px-2 rounded-md text-[#6e6e6e] hover:text-[#1b1c1c] transition-colors duration-200"
+                >
+                  Profile
+                </Link>
+
+
+                <SignOutButton>
+                  <button className="block w-full text-left text-sm py-1 px-2 rounded-md text-[#6e6e6e] hover:text-[#1b1c1c] transition-colors duration-200">
+                    Logout
+                  </button>
+                </SignOutButton>
+
+              </div>
+            )}
+          </div>
+        </SignedIn>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;
