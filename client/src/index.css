@@ -29,6 +29,17 @@ body{
     border: none !important;
 }
 
+/* Match ReactQuill placeholder with description style */
+.ql-editor::before {
+    content: attr(data-placeholder);
+    color: #1b1c1c;
+    font-family: Montserrat, sans-serif;
+    font-size: 1rem;
+    opacity: 0.6;
+    font-style: normal !important; /* this kills any leftover italics */
+    position: absolute;
+  }
+
 pre {
     background-color: #e0e0e0;
     color: #1b1c1c;
@@ -41,4 +52,15 @@ pre {
 code {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     font-size: 0.9em;
+}
+
+/* Make ReactQuill responsive */
+.ql-container {
+    min-height: 200px;
+    max-height: 600px;
+    height: 100%;
+    overflow-y: auto;
+    border-radius: 0.75rem; /* match Tailwind's rounded-xl */
+    background-color: #e0e0e0;
+    color: #1b1c1c;
 }
