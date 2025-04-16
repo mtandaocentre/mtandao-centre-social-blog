@@ -1,5 +1,10 @@
 import express from "express";
-import { getUserSavedPosts, savePost, updateUserDescription } from "../controllers/user.controller.js";
+import { 
+    getCurrentUser, 
+    getUserSavedPosts, 
+    savePost, 
+    updateUserDescription 
+} from "../controllers/user.controller.js";
 
 // define router
 const router = express.Router();
@@ -13,3 +18,6 @@ router.patch("/description", updateUserDescription);
 
 // Export router by default
 export default router
+
+// New route to get the logged-in user's full profile
+router.get("/me", getCurrentUser);
