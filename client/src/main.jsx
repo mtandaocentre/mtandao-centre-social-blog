@@ -19,6 +19,8 @@ import {
 } from '@tanstack/react-query'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
+import ProfilePage from './routes/ProfilePage.jsx'
+import EditProfilePage from './routes/EditProfilePage.jsx';  // Add this import
 
 const queryClient = new QueryClient()
 
@@ -60,6 +62,14 @@ const router = createBrowserRouter([
         path:"/register",
         element: <RegisterPage />
       },
+      {
+        path:"/profile",
+        element: <ProfilePage />
+      },
+      {
+        path: "/profile/edit",  // Add this new route
+        element: <EditProfilePage />  // This will show the Edit Profile Page
+      }
     ]
   }
 ]);
