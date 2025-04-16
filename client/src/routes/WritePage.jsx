@@ -9,65 +9,37 @@ import { toast } from "react-toastify";
 import Upload from "../components/Upload";
 
 const WritePage = () => {
-
-  // Check is user is authenticated
-  const {isLoaded, isSignedIn} =useUser();
-
-  // Create use state for geting content
+  const { isLoaded, isSignedIn } = useUser();
   const [value, setValue] = useState("");
-
-  // Create use state for geting cover image
   const [cover, setCover] = useState("");
-
-  // Create use state for geting content image
   const [img, setImg] = useState("");
-
-  // Create use state for geting content video
   const [video, setVideo] = useState("");
-
-  // Create use state for progress
   const [progress, setProgress] = useState(0);
-
-  // Create useEffect for adding image
-  useEffect(() => {
-    img && setValue(prev => prev + `<p><image src="${img.url}"/></p>`)
-  },[img])
-
-  // Append inserted images/videos to the editor content
-  useEffect(() => {
-  if (img && img.url) {
-    setValue(prev => prev + `<p><img src="${img.url}" alt="content image"/></p>`);
-  }
-  }, [img]);
-
-  // Create useEffect for adding video
-  useEffect(() => {
-  video && setValue(prev => prev + `<p><iframe class="ql-video" src="${video.url}"/></p>`)
-  },[video])
-
-  // Use navigate hook
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-
-  // Get token 
   const { getToken } = useAuth();
 
-  // Combined mutation for creating the post and updating user description
+  useEffect(() => {
+    if (img?.url) {
+      setValue(prev => prev + `<p><img src="${img.url}" alt="content image"/></p>`);
+    }
+  }, [img]);
+
+  useEffect(() => {
+    if (video?.url) {
+      setValue(prev => prev + `<p><iframe class="ql-video" src="${video.url}"/></p>`);
+    }
+  }, [video]);
+
   const mutation = useMutation({
-    mutationFn: async ({ data, authorDescription }) => {
+    mutationFn: async ({ data }) => {
       const token = await getToken();
-      const [postResponse, userDescResponse] = await Promise.all([
-        axios.post(`${import.meta.env.VITE_API_URL}/posts`, data, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        axios.patch(
-          `${import.meta.env.VITE_API_URL}/users/description`,
-          { description: authorDescription },
-          { headers: { Authorization: `Bearer ${token}` } }
-        ),
-      ]);
-      return { postResponse, userDescResponse };
+      const postResponse = await axios.post(`${import.meta.env.VITE_API_URL}/posts`, data, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return postResponse;
     },
-    onSuccess: ({ postResponse }) => {
+    onSuccess: (postResponse) => {
       toast.success("Your post has been created successfully!");
       navigate(`/${postResponse.data.slug}`);
     },
@@ -77,105 +49,75 @@ const WritePage = () => {
     },
   });
 
-  if(!isLoaded){
-    return <div className="">Loading...</div>
-  }
+  if (!isLoaded) return <div>Loading...</div>;
+  if (!isSignedIn) return <div>Sign in to access this page.</div>;
 
-  if(isLoaded && !isSignedIn){
-    return <div className="">SignIn to Access this page.</div>
-  }
-
-  // handle submit function
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const formData = new FormData(e.target);
+    const title = formData.get("title")?.trim();
+    const category = formData.get("category")?.trim();
+    const desc = formData.get("desc")?.trim();
+    const content = value?.trim();
 
+    const newErrors = {};
+    if (!cover?.filePath) newErrors.cover = "Please upload a cover image.";
+    if (!title) newErrors.title = "Title is required.";
+    if (!category) newErrors.category = "Category is required.";
+    if (!desc) newErrors.desc = "Description is required.";
+    if (!content) newErrors.content = "Content cannot be empty.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
     const data = {
-      img: cover.filePath || "",
-      title: formData.get("title"),
-      category: formData.get("category"),
-      desc: formData.get("desc"),
-      content: value,
+      img: cover.filePath,
+      title,
+      category,
+      desc,
+      content,
     };
 
-    // console.log(data);
-
-    const authorDescription = formData.get("authorDescription");
-
-    // Instead of calling mutation.mutate(data) directly, pass an object with both pieces of data
-    mutation.mutate({ data, authorDescription });
-
+    mutation.mutate({ data });
   };
 
-  //Custom tool bar react-quill
   const modules = {
     toolbar: [
-      [{ header: [1,2,3,4,5,6,false] }],
-      [{"font": []}],
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      [{ font: [] }],
       ["bold", "italic", "underline", "strike", "blockquote"],
-      [{"color": []}, {"background": []}],
-      [{"size": ["small", false, "large", "huge"]}],
-      [{list: "ordered"}, {list: "bullet"}, {"script": "sub"}, {"script": "super"}],
-      [{"indent": "-1"}, {"indent": "+1"}, {"align": []}],
+      [{ color: [] }, { background: [] }],
+      [{ size: ["small", false, "large", "huge"] }],
+      [{ list: "ordered" }, { list: "bullet" }, { script: "sub" }, { script: "super" }],
+      [{ indent: "-1" }, { indent: "+1" }, { align: [] }],
       ["link", "image", "video"],
-      [{"code-block": true}],
+      [{ "code-block": true }],
       ["clean"]
     ]
   };
 
   const formats = [
-    "header",
-    "font",
-    "size",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "blockquote",
-    "list",
-    "bullet",
-    "indent",
-    "link",
-    "image",
-    "color",
-    "code-block",
-    "video",
-    "script"
-  ]
+    "header", "font", "size", "bold", "italic", "underline", "strike",
+    "blockquote", "list", "bullet", "indent", "link", "image", "color",
+    "code-block", "video", "script"
+  ];
 
   return (
-    // Style root container
-    <div 
-      className='h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex
-      flex-col gap-6'
-    >
-      {/* Create page title */}
-      {/* Style page title */}
-      <h1 className="text-xl font-light">Create a New Post</h1>
-
-      {/* Create form */}
-      {/* Style form container */}
-      {/* Change actions to classname */}
-      {/* Fetch data from form  */}
+    <div className='h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6'>
+      <h1 className="text-xl font-light">Create a New Article</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
-
-        {/* Call upload component */}
-        <Upload type="image" setProgress={setProgress} setData={(data) => {
-          console.log("Cover upload response:", data);
-          setCover(data);
-        }}>
-          {/* Add button for adding cover image */}
-          {/* Style button */}
-          <button 
-            className="w-max p-2 shadow-md rounded-xl text-sm text-[#1b1c1c]
-            bg-[#a3a3a3]"
-          >
+        
+        {/* Cover Image */}
+        <Upload type="image" setProgress={setProgress} setData={setCover}>
+          <button className="w-max p-2 shadow-md rounded-xl text-sm text-[#1b1c1c] bg-[#a3a3a3]">
             Add a cover image
-          </button> 
-        </Upload> 
+          </button>
+        </Upload>
+        {errors.cover && <span className="text-red-500 text-sm">{errors.cover}</span>}
 
-        {/* Cover image preview */}
         {cover?.url && (
           <img
             src={cover.url}
@@ -184,25 +126,24 @@ const WritePage = () => {
           />
         )}
 
-        {/* Add title */}
+        {/* Title */}
         <input 
-          className="text-4xl font-semibold bg-transparent 
-          outline-none" 
+          className="text-4xl font-semibold bg-transparent outline-none" 
           type="text" 
-          placeholder="My Tech Idea/Story" 
+          placeholder="Add a Title to Your Article" 
           name="title"
         />
+        {errors.title && <span className="text-red-500 text-sm">{errors.title}</span>}
 
-        {/* Create choose category section */}
-        {/* Style choose category section */}
+        {/* Category */}
         <div className="flex items-center gap-4">
-          <label htmlFor="" className="text-sm">Choose a category:</label>
+          <label htmlFor="category" className="text-sm">Choose a category:</label>
           <select 
             name="category" 
-            id="" 
-            className="p-2 rounded-xl bg-[#a3a3a3] text-[#1b1c1c] 
-            shadow-md"
+            id="category"
+            className="p-2 rounded-xl bg-[#a3a3a3] text-[#1b1c1c] shadow-md"
           >
+            <option value="">-- Select --</option>
             <option value="general">General</option>
             <option value="aiot">AIoT</option>
             <option value="cloud">Cloud</option>
@@ -213,67 +154,56 @@ const WritePage = () => {
             <option value="web">Web</option>
           </select>
         </div>
+        {errors.category && <span className="text-red-500 text-sm">{errors.category}</span>}
 
-        {/* Add description text area */}
-        {/* Style description text area */}
+        {/* Description */}
         <textarea 
           name="desc" 
-          placeholder="Add a short description about the article you are writting..."
-          className="p-4 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md" 
-        />
-
-        {/* Add photo and video emoji */}
-        <div className="flex flex-1">
-
-          <div className="flex flex-col gap-2 mr-2 ">
-            <Upload type="image" setProgress={setProgress} setData={setImg}>
-              🌆
-            </Upload> 
-            <Upload type="video" setProgress={setProgress} setData={setVideo}>
-              ▶️
-            </Upload> 
-          </div>
-
-          {/* Use react Quill to create write page content text area */}
-          {/* Style quill */}
-          <ReactQuill 
-            theme="snow" 
-            className="flex-1 h-[500px] rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
-            value={value} 
-            onChange={setValue}
-            modules = {modules}
-            formats = {formats}
-            readOnly={0 < progress && progress < 100}
-          />
-
-        </div>
-
-         {/* New field for author description */}
-         <textarea
-          name="authorDescription"
-          placeholder="Add a short description about the author of the article..."
+          placeholder="Add a short description about your article..."
           className="p-4 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
         />
+        {errors.desc && <span className="text-red-500 text-sm">{errors.desc}</span>}
 
-        {/* Add send button */}
-        {/* Style send button */}
-        {/* Use mutation on button */}
+        {/* Editor */}
+        <div className="flex flex-col gap-2">
+          <ReactQuill 
+            theme="snow" 
+            className="h-[300px] rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md overflow-y-auto"
+            value={value} 
+            onChange={setValue}
+            modules={modules}
+            formats={formats}
+            placeholder="Write your article here..."
+            readOnly={0 < progress && progress < 100}
+          />
+          {errors.content && (
+            <span className="text-red-500 text-sm">{errors.content}</span>
+          )}
+        </div>
+
+        {/* Uploads */}
+        <div className="flex gap-4">
+          <Upload type="image" setProgress={setProgress} setData={setImg}>
+            🌆
+          </Upload> 
+          <Upload type="video" setProgress={setProgress} setData={setVideo}>
+            ▶️
+          </Upload>
+        </div>
+
+        {/* Submit */}
         <button 
-          disabled = {mutation.isPending || (0 < progress && progress < 100)}
+          disabled={mutation.isPending || (0 < progress && progress < 100)}
           className="text-[#1b1c1c] bg-[#a3a3a3] font-medium
-          rounded-xl mt-4 p-2 w-36 disabled:bg-[#cfcfcf]
-          disabled:cursor-not-allowed"
+            rounded-xl mt-4 p-2 w-36 disabled:bg-[#cfcfcf]
+            disabled:cursor-not-allowed"
         >
           {mutation.isPending ? "Loading..." : "Send"}
         </button>
-        {/* progress button */}
-        {"Progress:" + progress}
-        {/* { mutation.isError && <span>{mutation.error.message}</span> } */}
+        {"Progress: " + progress}
       </form>
-
-
     </div>
-  )
-}
+  );
+};
 
-export default WritePage
+export default WritePage;
