@@ -70,3 +70,24 @@ export const updateUserDescription = async (req, res) => {
     }
 
   };
+
+  export const getCurrentUser = async (req, res) => {
+    const clerkUserId = req.auth.userId;
+  
+    if (!clerkUserId) {
+      return res.status(401).json("Sign in to perform this action!");
+    }
+  
+    try {
+      const user = await User.findOne({ clerkUserId }).select("username email img description savedPosts");
+  
+      if (!user) {
+        return res.status(404).json("User not found!");
+      }
+  
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
