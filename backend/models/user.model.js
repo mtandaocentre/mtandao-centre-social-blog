@@ -1,9 +1,13 @@
-import { Schema } from "mongoose";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
+
+// Word count validator function
+const validateDescriptionLength = (value) => {
+  const wordCount = value.trim().split(/\s+/).filter(Boolean).length; // Count words, trimming whitespace
+  return wordCount <= 50;  // Ensure no more than 50 words
+};
 
 const userSchema = new Schema(
   {
-
     // Clerk user ID
     clerkUserId: {
       type: String,
@@ -18,32 +22,34 @@ const userSchema = new Schema(
       unique: true,
     },
 
-    // email
+    // Email
     email: {
       type: String,
       required: true,
       unique: true,
     },
 
-    // image
+    // Image
     img: {
       type: String,
     },
 
-    //saved posts
+    // Saved posts (array of post IDs or other references)
     savedPosts: {
       type: [String],
       default: [],
     },
 
-    // Author description
+    // Author description with word limit validation
     description: {
       type: String,
       default: "",  // or use a default text if preferred
+      validate: {
+        validator: validateDescriptionLength,
+        message: "Description must be no longer than 50 words.",
+      },
     },
   },
-
-  // Time created
   { timestamps: true }
 );
 
