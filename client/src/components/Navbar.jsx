@@ -90,7 +90,6 @@ const Navbar = () => {
 
             {dropdownOpen && (
               <div ref={dropdownRef} className="mt-4 bg-[#d1cfcf] shadow-xl rounded-lg p-4 w-40">
-                
                 <Link
                   to="/profile"
                   onClick={() => setDropdownOpen(false)}
@@ -99,12 +98,19 @@ const Navbar = () => {
                   Profile
                 </Link>
 
+                <Link
+                  to="/write"
+                  onClick={() => setDropdownOpen(false)}
+                  className="block text-sm py-1 px-2 rounded-md text-[#6e6e6e] hover:text-[#1b1c1c] transition-colors duration-200"
+                >
+                  Write a Post
+                </Link>
+
                 <SignOutButton>
                   <button className="block w-full text-left text-sm py-1 px-2 rounded-md text-[#6e6e6e] hover:text-[#1b1c1c] transition-colors duration-200">
                     Logout
                   </button>
                 </SignOutButton>
-
               </div>
             )}
           </SignedIn>
@@ -144,7 +150,6 @@ const Navbar = () => {
 
             {dropdownOpen && (
               <div ref={dropdownRef} className="absolute right-0 mt-2 bg-[#d1cfcf] shadow-lg rounded-lg p-3 w-40 z-30">
-              
                 <Link
                   to="/profile"
                   onClick={() => setDropdownOpen(false)}
@@ -153,13 +158,19 @@ const Navbar = () => {
                   Profile
                 </Link>
 
+                <Link
+                  to="/write"
+                  onClick={() => setDropdownOpen(false)}
+                  className="block text-sm py-1 px-2 rounded-md text-[#6e6e6e] hover:text-[#1b1c1c] transition-colors duration-200"
+                >
+                  Write a Post
+                </Link>
 
                 <SignOutButton>
                   <button className="block w-full text-left text-sm py-1 px-2 rounded-md text-[#6e6e6e] hover:text-[#1b1c1c] transition-colors duration-200">
                     Logout
                   </button>
                 </SignOutButton>
-
               </div>
             )}
           </div>
