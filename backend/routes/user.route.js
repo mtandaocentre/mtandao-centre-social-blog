@@ -1,23 +1,26 @@
 import express from "express";
+import multer from "multer";
 import { 
-    getCurrentUser, 
-    getUserSavedPosts, 
-    savePost, 
-    updateUserDescription 
+  getCurrentUser, 
+  getUserSavedPosts, 
+  savePost, 
+  updateUserDescription,
+  updateUserById
 } from "../controllers/user.controller.js";
 
-// define router
 const router = express.Router();
 
-// Use router for api call
+// Set up multer to use memory storage (for base64 or cloud uploads)
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// ✅ Apply multer to this route
+router.patch("/:userId", upload.single("profilePic"), updateUserById);
+
+// Existing routes
 router.get("/saved", getUserSavedPosts);
 router.patch("/save", savePost);
-
-// New route for updating user description
 router.patch("/description", updateUserDescription);
-
-// Export router by default
-export default router
-
-// New route to get the logged-in user's full profile
 router.get("/me", getCurrentUser);
+
+export default router;
