@@ -5,7 +5,8 @@ import {
   getUserSavedPosts, 
   savePost, 
   updateUserDescription,
-  updateUserById
+  updateUserById,
+  getUserById
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
@@ -22,5 +23,6 @@ router.get("/saved", getUserSavedPosts);
 router.patch("/save", savePost);
 router.patch("/description", updateUserDescription);
 router.get("/me", getCurrentUser);
+router.get("/:userId", getUserById); // 👈 Add this
 
 export default router;
