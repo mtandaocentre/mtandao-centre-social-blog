@@ -93,8 +93,8 @@ export const getCurrentUser = async (req, res) => {
 
   try {
     const user = await User.findOne({ clerkUserId }).select(
-      "username email img description savedPosts"
-    );
+      "username email img description savedPosts github linkedin twitter whatsapp instagram facebook tiktok"
+    );    
 
     if (!user) {
       return res.status(404).json("User not found!");
@@ -121,12 +121,34 @@ export const getCurrentUser = async (req, res) => {
 export const updateUserById = async (req, res) => {
   const authUserId = req.auth?.userId;
   const { userId } = req.params;
-  const { username, description } = req.body;
+  const { 
+    username, 
+    description, 
+    github, 
+    linkedin, 
+    twitter, 
+    whatsapp, 
+    instagram, 
+    facebook, 
+    tiktok, 
+    telegram 
+  } = req.body;
   const profilePic = req.file; // multer adds this
 
   console.log("Auth User ID:", authUserId);
   console.log("Updating Mongo User ID:", userId);
-  console.log("New values:", { username, description });
+  console.log("New values:", { 
+    username, 
+    description, 
+    github, 
+    linkedin, 
+    twitter, 
+    whatsapp, 
+    instagram, 
+    facebook, 
+    tiktok, 
+    telegram 
+  });
 
   if (!authUserId) {
     return res.status(401).json("Sign in to perform this action!");
@@ -147,9 +169,18 @@ export const updateUserById = async (req, res) => {
       img = `data:${profilePic.mimetype};base64,${profilePic.buffer.toString("base64")}`;
     }
 
+    // Prepare the update data including social links
     const updateData = {
       username,
       description,
+      github,
+      linkedin,
+      twitter,
+      whatsapp,
+      instagram,
+      facebook,
+      tiktok,
+      telegram,
       ...(img && { img }), // only include img if there’s a new profilePic
     };
 
@@ -164,6 +195,30 @@ export const updateUserById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getUserById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId).select(
+      "username email img description github linkedin twitter whatsapp instagram facebook tiktok telegram"
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      ...user.toObject(),
+      imageUrl: user.img, // 🔄 normalize for frontend
+    });
+  } catch (err) {
+    console.error("Error getting user by ID:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 
 
 
