@@ -4,6 +4,16 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Upload from "../components/Upload";
+import { 
+  FaGithub, 
+  FaLinkedin, 
+  FaXTwitter, 
+  FaWhatsapp, 
+  FaInstagram, 
+  FaFacebook, 
+  FaTiktok, 
+  FaTelegram 
+} from "react-icons/fa6"; // Import Telegram icon
 
 const EditProfilePage = () => {
   const { user, isLoaded } = useUser();
@@ -16,12 +26,17 @@ const EditProfilePage = () => {
   const [bio, setBio] = useState("");
   const [profilePic, setProfilePic] = useState("");
   const [saving, setSaving] = useState(false);
+  const [github, setGithub] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [facebook, setFacebook] = useState("");
+  const [tiktok, setTiktok] = useState("");
+  const [telegram, setTelegram] = useState(""); // Add telegram state
 
   const maxWords = 50;
-
-  const wordCount = useMemo(() => {
-    return bio.trim().split(/\s+/).filter(Boolean).length;
-  }, [bio]);
+  const wordCount = useMemo(() => bio.trim().split(/\s+/).filter(Boolean).length, [bio]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -36,6 +51,14 @@ const EditProfilePage = () => {
         setUsername(data.username || "");
         setEmail(data.email || user.primaryEmailAddress.emailAddress || "");
         setBio(data.description || "");
+        setGithub(data.github || "");
+        setLinkedin(data.linkedin || "");
+        setTwitter(data.twitter || "");
+        setWhatsapp(data.whatsapp || "");
+        setInstagram(data.instagram || "");
+        setFacebook(data.facebook || "");
+        setTiktok(data.tiktok || "");
+        setTelegram(data.telegram || ""); // Fetch telegram value
       } catch {
         toast.error("Failed to load profile info.");
       }
@@ -57,6 +80,14 @@ const EditProfilePage = () => {
       formData.append("email", email);
       formData.append("description", bio);
       if (profilePic) formData.append("image", profilePic);
+      formData.append("github", github);
+      formData.append("linkedin", linkedin);
+      formData.append("twitter", twitter);
+      formData.append("whatsapp", whatsapp);
+      formData.append("instagram", instagram);
+      formData.append("facebook", facebook);
+      formData.append("tiktok", tiktok);
+      formData.append("telegram", telegram); // Include telegram
 
       await axios.patch(`${import.meta.env.VITE_API_URL}/users/${mongoUserId}`, formData, {
         headers: { Authorization: `Bearer ${token}` },
@@ -71,9 +102,7 @@ const EditProfilePage = () => {
     }
   };
 
-  const handleBioChange = (e) => {
-    setBio(e.target.value);
-  };
+  const handleBioChange = (e) => setBio(e.target.value);
 
   if (!isLoaded) return <div>Loading...</div>;
 
@@ -136,6 +165,99 @@ const EditProfilePage = () => {
             {wordCount} / {maxWords} words
             {wordCount > maxWords && " — Too many words!"}
           </small>
+        </div>
+        
+        {/* Social media links */}
+        <h2 className="text-lg font-semibold mt-4">Social Links:</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* GitHub */}
+          <div className="flex items-center gap-2">
+            <FaGithub />
+            <input
+              type="url"
+              placeholder="GitHub URL"
+              value={github}
+              onChange={(e) => setGithub(e.target.value)}
+              className="p-2 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
+            />
+          </div>
+          {/* LinkedIn */}
+          <div className="flex items-center gap-2">
+            <FaLinkedin />
+            <input
+              type="url"
+              placeholder="LinkedIn URL"
+              value={linkedin}
+              onChange={(e) => setLinkedin(e.target.value)}
+              className="p-2 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
+            />
+          </div>
+          {/* Twitter */}
+          <div className="flex items-center gap-2">
+            <FaXTwitter />
+            <input
+              type="url"
+              placeholder="X (Twitter) URL"
+              value={twitter}
+              onChange={(e) => setTwitter(e.target.value)}
+              className="p-2 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
+            />
+          </div>
+          {/* WhatsApp */}
+          <div className="flex items-center gap-2">
+            <FaWhatsapp />
+            <input
+              type="url"
+              placeholder="WhatsApp Link"
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(e.target.value)}
+              className="p-2 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
+            />
+          </div>
+          {/* Instagram */}
+          <div className="flex items-center gap-2">
+            <FaInstagram />
+            <input
+              type="url"
+              placeholder="Instagram URL"
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              className="p-2 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
+            />
+          </div>
+          {/* Facebook */}
+          <div className="flex items-center gap-2">
+            <FaFacebook />
+            <input
+              type="url"
+              placeholder="Facebook URL"
+              value={facebook}
+              onChange={(e) => setFacebook(e.target.value)}
+              className="p-2 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
+            />
+          </div>
+          {/* TikTok */}
+          <div className="flex items-center gap-2">
+            <FaTiktok />
+            <input
+              type="url"
+              placeholder="TikTok URL"
+              value={tiktok}
+              onChange={(e) => setTiktok(e.target.value)}
+              className="p-2 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
+            />
+          </div>
+          {/* Telegram */}
+          <div className="flex items-center gap-2">
+            <FaTelegram />
+            <input
+              type="url"
+              placeholder="Telegram Link"
+              value={telegram}
+              onChange={(e) => setTelegram(e.target.value)}
+              className="p-2 rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md"
+            />
+          </div>
         </div>
 
         {/* Action Buttons */}
