@@ -64,3 +64,13 @@ code {
     background-color: #e0e0e0;
     color: #1b1c1c;
 }
+
+/* Hide scrollbar across browsers */
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;             /* Chrome, Safari, Opera */
+}
