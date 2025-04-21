@@ -10,16 +10,26 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "timeago.js";
 import parse from "html-react-parser";
 import { motion } from "framer-motion";
-import { 
-  FaEye, 
-  FaHeart, 
+// FA6 imports (Font Awesome 6)
+import {
+  FaGithub,
+  FaLinkedin,
+  FaXTwitter,
+  FaWhatsapp,
+  FaInstagram,
+  FaFacebook,
+  FaTiktok,
+  FaTelegram,
+} from "react-icons/fa6";
+// FA5 icons (not available in fa6)
+import {
+  FaEye,
+  FaHeart,
   FaShareAlt,
-  FaFacebookF, 
-  FaTwitter, 
-  FaLinkedinIn, 
-  FaWhatsapp, 
-  FaTelegram, 
-  FaCopy  
+  FaFacebookF,
+  FaTwitter,
+  FaLinkedinIn,
+  FaCopy,
 } from "react-icons/fa";
 
 
@@ -204,7 +214,7 @@ const SinglePostPage = () => {
       case "facebook":
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${postUrl}`;
         break;
-      case "twitter":
+      case "x":
         shareUrl = `https://twitter.com/intent/tweet?url=${postUrl}&text=${postTitle}`;
         break;
       case "linkedin":
@@ -265,6 +275,8 @@ const SinglePostPage = () => {
         </div>
         {/* Sidebar (25% on md+) */}
         <div className="px-4 h-max sticky top-8 w-full md:w-1/4">
+          
+          {/* Author */}
           <h1 className="mb-4 text-sm font-medium">Author</h1>
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-8">
@@ -279,11 +291,53 @@ const SinglePostPage = () => {
               <Link className="font-bold">{data.user.username}</Link>
             </div>
             <p className="text-sm font-medium">{data.user.description || "No description available."}</p>
+            
+            {/*Social media links*/}
             <div className="flex gap-2">
-              <Link><Image src="facebook.svg" /></Link>
-              <Link><Image src="instagram.svg" /></Link>
+              {data.user.github && (
+                <a href={data.user.github} target="_blank" rel="noopener noreferrer">
+                  <FaGithub className="text-xl text-[#333] hover:opacity-80 transition" />
+                </a>
+              )}
+              {data.user.linkedin && (
+                <a href={data.user.linkedin} target="_blank" rel="noopener noreferrer">
+                  <FaLinkedin className="text-xl text-[#0077B5] hover:opacity-80 transition" />
+                </a>
+              )}
+              {data.user.twitter && (
+                <a href={data.user.twitter} target="_blank" rel="noopener noreferrer">
+                  <FaXTwitter className="text-xl text-black hover:opacity-80 transition" />
+                </a>
+              )}
+              {data.user.whatsapp && (
+                <a href={data.user.whatsapp} target="_blank" rel="noopener noreferrer">
+                  <FaWhatsapp className="text-xl text-[#25D366] hover:opacity-80 transition" />
+                </a>
+              )}
+              {data.user.instagram && (
+                <a href={data.user.instagram} target="_blank" rel="noopener noreferrer">
+                  <FaInstagram className="text-xl text-[#E1306C] hover:opacity-80 transition" />
+                </a>
+              )}
+              {data.user.facebook && (
+                <a href={data.user.facebook} target="_blank" rel="noopener noreferrer">
+                  <FaFacebook className="text-xl text-[#1877F2] hover:opacity-80 transition" />
+                </a>
+              )}
+              {data.user.tiktok && (
+                <a href={data.user.tiktok} target="_blank" rel="noopener noreferrer">
+                  <FaTiktok className="text-xl text-black hover:opacity-80 transition" />
+                </a>
+              )}
+              {data.user.telegram && (
+                <a href={data.user.telegram} target="_blank" rel="noopener noreferrer">
+                  <FaTelegram className="text-xl text-[#0088cc] hover:opacity-80 transition" />
+                </a>
+              )}
             </div>
+
           </div>
+          
           <PostMenuAction post={data} />
           <h1 className="mt-8 mb-4 text-sm font-medium">Categories</h1>
           <div className="flex flex-col gap-2 text-sm">
@@ -343,11 +397,11 @@ const SinglePostPage = () => {
             <span>Facebook</span>
           </button>
           <button
-            onClick={() => shareOnSocialMedia("twitter")}
-            className="inline-flex items-center gap-2 bg-[#1da1f2] px-4 py-2 rounded-full text-white text-sm font-semibold shadow-lg hover:bg-[#0d8ae6] transition duration-200"
+            onClick={() => shareOnSocialMedia("x")}
+            className="inline-flex items-center gap-2 bg-black px-4 py-2 rounded-full text-white text-sm font-semibold shadow-lg hover:bg-neutral-800 transition duration-200"
           >
             <FaTwitter className="w-4 h-4" />
-            <span>Twitter</span>
+            <span>X</span>
           </button>
           <button
             onClick={() => shareOnSocialMedia("linkedin")}
