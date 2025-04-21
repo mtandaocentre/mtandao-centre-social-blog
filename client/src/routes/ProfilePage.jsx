@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
+import {
+  FaGithub,
+  FaLinkedin,
+  FaXTwitter,
+  FaWhatsapp,
+  FaInstagram,
+  FaFacebook,
+  FaTiktok,
+  FaTelegram // Import the Telegram icon
+} from "react-icons/fa6"; // from react-icons v6 for newer logos
 
 const ProfilePage = () => {
   const { getToken } = useAuth();
@@ -72,6 +82,117 @@ const ProfilePage = () => {
           <p className="text-sm p-4 border rounded-xl shadow-md">
             {profileData?.description || "No bio available"}
           </p>
+        </div>
+
+        {/* Social Media Links */}
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-2">Social Links</h2>
+          <ul className="flex flex-wrap gap-3">
+            {profileData?.github && (
+              <li>
+                <a
+                  href={profileData.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#333] text-white text-sm hover:bg-[#24292e] transition"
+                >
+                  <FaGithub className="text-base" />
+                  <span>GitHub</span>
+                </a>
+              </li>
+            )}
+            {profileData?.linkedin && (
+              <li>
+                <a
+                  href={profileData.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0077b5] text-white text-sm hover:bg-[#005c91] transition"
+                >
+                  <FaLinkedin className="text-base" />
+                  <span>LinkedIn</span>
+                </a>
+              </li>
+            )}
+            {profileData?.twitter && (
+              <li>
+                <a
+                  href={profileData.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black text-white text-sm hover:bg-neutral-800 transition"
+                >
+                  <FaXTwitter className="text-base" />
+                  <span>X</span>
+                </a>
+              </li>
+            )}
+            {profileData?.whatsapp && (
+              <li>
+                <a
+                  href={profileData.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#25D366] text-white text-sm hover:bg-[#1ebc57] transition"
+                >
+                  <FaWhatsapp className="text-base" />
+                  <span>WhatsApp</span>
+                </a>
+              </li>
+            )}
+            {profileData?.instagram && (
+              <li>
+                <a
+                  href={profileData.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 text-white text-sm hover:opacity-90 transition"
+                >
+                  <FaInstagram className="text-base" />
+                  <span>Instagram</span>
+                </a>
+              </li>
+            )}
+            {profileData?.facebook && (
+              <li>
+                <a
+                  href={profileData.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1877F2] text-white text-sm hover:bg-[#145dbf] transition"
+                >
+                  <FaFacebook className="text-base" />
+                  <span>Facebook</span>
+                </a>
+              </li>
+            )}
+            {profileData?.tiktok && (
+              <li>
+                <a
+                  href={profileData.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black text-white text-sm hover:bg-gray-800 transition"
+                >
+                  <FaTiktok className="text-base" />
+                  <span>TikTok</span>
+                </a>
+              </li>
+            )}
+            {profileData?.telegram && (
+              <li>
+                <a
+                  href={profileData.telegram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0088cc] text-white text-sm hover:bg-[#0077b3] transition"
+                >
+                  <FaTelegram className="text-base" />
+                  <span>Telegram</span>
+                </a>
+              </li>
+            )}
+          </ul>
         </div>
 
         {/* Saved Posts Preview */}
