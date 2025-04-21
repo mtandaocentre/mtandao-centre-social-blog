@@ -71,10 +71,14 @@ export const getPosts = async (req, res) => {
     }
 
     const posts = await Post.find(query)
-      .populate("user", "username")
-      .sort(sortObj)
-      .limit(limit)
-      .skip((page - 1) * limit);
+  .populate(
+    "user", 
+    "username profilePic github linkedin twitter whatsapp instagram facebook tiktok telegram"
+  )
+  .sort(sortObj)
+  .limit(limit)
+  .skip((page - 1) * limit);
+
 
     const totalPosts = await Post.countDocuments();
     const hasMore = page * limit < totalPosts;
@@ -92,8 +96,12 @@ export const getPost = async (req, res) => {
   try {
     const { slug } = req.params;
     const post = await Post.findOne({ slug })
-      .populate("user", "username img description")
+      .populate(
+        "user", 
+        "username img description github linkedin twitter whatsapp instagram facebook tiktok telegram"
+      )
       .populate("likes", "username");
+
 
     if (!post) return res.status(404).json({ message: "Post not found" });
 
