@@ -11,20 +11,19 @@ const HomePage = () => {
       <div className="flex gap-4 text-[#e0e0e0]">
         <Link to="/" className="font-bold">Home</Link>
         <span>•</span>
-        <span>Blogs and Articles</span>
+        <span>Your Online Place for Everything Computers.</span>
       </div>
 
       {/* INTRODUCTION */}
       <div className="flex items-centre justify-between">
         <div>
+
           <h1 
-            className="text-[#e0e0e0] text-2xl md:text-5xl lg:text-6xl font-bold"
+            className="mt-8 mb-8 text-[#e0e0e0] text-2xl md:text-5xl lg:text-6xl font-bold"
           >
             Your Online Place for Everything Computers.
           </h1>
-          <p className="mt-8 text-md md:text-xl">
-            Your Online Place for Everything Computers.
-          </p>
+         
         </div>
       </div>
 
@@ -32,7 +31,11 @@ const HomePage = () => {
       <MainCategories />
 
       {/* FEATURED POSTS */}
-      <FeaturedPosts />
+      <div>
+        <h1 className="my-8 text-2xl text-[#e0e0e0]">Featured Posts</h1>
+        <FeaturedPosts />
+      </div>
+      
       
       {/* POST LIST */}
       <div className="">
