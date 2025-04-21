@@ -2,8 +2,8 @@ import mongoose, { Schema } from "mongoose";
 
 // Word count validator function
 const validateDescriptionLength = (value) => {
-  const wordCount = value.trim().split(/\s+/).filter(Boolean).length; // Count words, trimming whitespace
-  return wordCount <= 50;  // Ensure no more than 50 words
+  const wordCount = value.trim().split(/\s+/).filter(Boolean).length;
+  return wordCount <= 50;
 };
 
 const userSchema = new Schema(
@@ -29,26 +29,35 @@ const userSchema = new Schema(
       unique: true,
     },
 
-    // Image
+    // Profile image
     img: {
       type: String,
     },
 
-    // Saved posts (array of post IDs or other references)
+    // Saved posts
     savedPosts: {
       type: [String],
       default: [],
     },
 
-    // Author description with word limit validation
+    // Bio/Description
     description: {
       type: String,
-      default: "",  // or use a default text if preferred
+      default: "",
       validate: {
         validator: validateDescriptionLength,
         message: "Description must be no longer than 50 words.",
       },
     },
+
+    // 🔗 Social media links
+    github: { type: String, default: "" },
+    linkedin: { type: String, default: "" },
+    twitter: { type: String, default: "" },
+    whatsapp: { type: String, default: "" },
+    instagram: { type: String, default: "" },
+    facebook: { type: String, default: "" },
+    tiktok: { type: String, default: "" },
   },
   { timestamps: true }
 );
