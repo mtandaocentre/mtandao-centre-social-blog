@@ -15,18 +15,22 @@ export const getUserSavedPosts = async (req, res) => {
       return res.status(404).json("User not found!");
     }
 
-    // Fetch the posts using the post IDs from savedPosts field in User model
     const savedPosts = await Post.find({
       _id: { $in: user.savedPosts },
-    }).select("title desc"); // Select title and description for each post
+    })
+      .select("title desc slug category img createdAt user") // 👈 select relevant fields
+      .populate({
+        path: "user", // 👈 this is your author field
+        select: "username", // 👈 include author name
+      });
 
     if (!savedPosts || savedPosts.length === 0) {
       return res.status(404).json("No saved posts found!");
     }
 
-    // Send the saved posts along with the title and description
     res.status(200).json(savedPosts);
   } catch (error) {
+    console.error("Error fetching saved posts:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -94,29 +98,39 @@ export const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findOne({ clerkUserId }).select(
       "username email img description savedPosts github linkedin twitter whatsapp instagram facebook tiktok"
-    );    
+    );
 
     if (!user) {
       return res.status(404).json("User not found!");
     }
 
-    // Fetch the posts using the post IDs from savedPosts field in User model
+    // ✅ Populate saved posts with post author and optional category
     const savedPosts = await Post.find({
       _id: { $in: user.savedPosts },
-    }).select("title desc"); // Select title and description for each post
+    })
+      .select("img title desc slug category createdAt user")
+      .populate({
+        path: "user",
+        select: "username",
+      })
+      .populate({
+        path: "category", // if you have this in your post schema
+        select: "name",
+      });
 
-    // Combine user data with saved posts data
     const userProfile = {
       ...user.toObject(),
       imageUrl: user.img,
-      savedPosts: savedPosts, // Attach savedPosts with full details
+      savedPosts,
     };
 
     res.status(200).json(userProfile);
   } catch (error) {
+    console.error("getCurrentUser error:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 export const updateUserById = async (req, res) => {
   const authUserId = req.auth?.userId;
