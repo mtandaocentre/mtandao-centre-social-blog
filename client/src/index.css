@@ -74,3 +74,13 @@ code {
   .no-scrollbar::-webkit-scrollbar {
     display: none;             /* Chrome, Safari, Opera */
 }
+
+/* Add this to your global CSS file or as a Tailwind plugin */
+@layer utilities {
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+}
