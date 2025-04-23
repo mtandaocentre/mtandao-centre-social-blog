@@ -6,6 +6,7 @@ import commentRouter from "./routes/comment.route.js";
 import webhookRouter from "./routes/webhook.route.js";
 import { clerkMiddleware, requireAuth } from "@clerk/express";
 import cors from "cors";
+import path from 'path';
 
 // Create express app/server
 const app = express();
