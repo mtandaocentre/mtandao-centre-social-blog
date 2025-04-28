@@ -246,9 +246,19 @@ const SinglePostPage = () => {
         <div className="lg:w-3/5 flex flex-col gap-8">
           <h1 className="text-xl md:text-3xl xl:text-4xl 2xl:text-5xl font-bold">{data.title}</h1>
           <div className="flex items-center gap-2 text-[#e0e0e0] text-sm">
-            <Link className="text-[#e0e0e0] font-semibold">{data.category}</Link>
+            <Link 
+              className="text-[#e0e0e0] font-semibold"
+              to={`/posts?cat=${data.category}`}
+            >
+              {data.category}
+            </Link>
             <span>Written by</span>
-            <Link className="text-[#e0e0e0] font-semibold">{data.user.username}</Link>
+            <Link 
+              className="text-[#e0e0e0] font-semibold"
+              to={`/posts?author=${data.user.username}`}
+            >
+              {data.user.username}
+            </Link>
             <span>on</span>
             <span>{format(data.createdAt)}</span>
             <div className="flex items-center gap-1 bg-[#e0e0e0] px-3 py-1 rounded-full text-sm font-semibold text-[#1b1c1c]">
@@ -257,7 +267,7 @@ const SinglePostPage = () => {
             </div>
           </div>
 
-          <p className="text-[#e0e0e0] font-medium w-full max-w">{data.desc}</p>
+          <p className="text-[#e0e0e0] font-medium w-full max-w mb-2">{data.desc}</p>
         </div>
 
         {data.img && (
@@ -270,7 +280,7 @@ const SinglePostPage = () => {
       {/* Content and Sidebar */}
       <div className="flex flex-col md:flex-row gap-12">
         {/* Content Area (75% on md+) */}
-        <div className="lg:text-lg flex flex-col gap-6 text-justify w-full md:w-3/5">
+        <div className="lg:text-lg flex flex-col gap-2 text-justify w-full md:w-3/5">
           {parse(transformCodeBlocks(data.content))}
         </div>
         {/* Sidebar (25% on md+) */}
