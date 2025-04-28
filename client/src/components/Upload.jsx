@@ -22,7 +22,7 @@ const authenticator =  async () => {
     }
 };
 
-const Upload = ({ children, type, setProgress, setData }) => {
+const Upload = ({ children, type, setData }) => {
 
     // use ref hook
     const ref = useRef(null)
@@ -40,12 +40,6 @@ const Upload = ({ children, type, setProgress, setData }) => {
     toast.success("Media Upload was Successful!");
   };
 
-    // onUploadProgress Function
-  const onUploadProgress = (progress) =>{
-    console.log(progress);
-    setProgress(Math.round(progress.loaded/progress.total) * 100)
-  };
-
   return (
     <IKContext 
         publicKey={import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY} 
@@ -56,12 +50,9 @@ const Upload = ({ children, type, setProgress, setData }) => {
             // use unique file name for files
             useUniqueFileName
 
-            // Handle on error and on sucess functions
+            // Handle on error and on success functions
             onError={onError}
             onSuccess={onSuccess}
-            
-            // handle onUpload progress
-            onUploadProgress={onUploadProgress}
 
             // hide upload button
             className="hidden"
