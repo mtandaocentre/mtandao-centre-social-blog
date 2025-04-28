@@ -14,7 +14,6 @@ const WritePage = () => {
   const [cover, setCover] = useState("");
   const [img, setImg] = useState("");
   const [video, setVideo] = useState("");
-  const [progress, setProgress] = useState(0);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { getToken } = useAuth();
@@ -111,7 +110,7 @@ const WritePage = () => {
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
         
         {/* Cover Image */}
-        <Upload type="image" setProgress={setProgress} setData={setCover}>
+        <Upload type="image" setData={setCover}>
           <button className="w-max p-2 shadow-md rounded-xl text-sm text-[#1b1c1c] bg-[#a3a3a3]">
             Add a cover image
           </button>
@@ -174,7 +173,7 @@ const WritePage = () => {
             modules={modules}
             formats={formats}
             placeholder="Write your article here..."
-            readOnly={0 < progress && progress < 100}
+            readOnly={mutation.isPending}
           />
           {errors.content && (
             <span className="text-red-500 text-sm">{errors.content}</span>
@@ -183,24 +182,23 @@ const WritePage = () => {
 
         {/* Uploads */}
         <div className="flex gap-4">
-          <Upload type="image" setProgress={setProgress} setData={setImg}>
+          <Upload type="image" setData={setImg}>
             🌆
           </Upload> 
-          <Upload type="video" setProgress={setProgress} setData={setVideo}>
+          <Upload type="video" setData={setVideo}>
             ▶️
           </Upload>
         </div>
 
         {/* Submit */}
         <button 
-          disabled={mutation.isPending || (0 < progress && progress < 100)}
+          disabled={mutation.isPending}
           className="text-[#1b1c1c] bg-[#a3a3a3] font-medium
-            rounded-xl mt-4 p-2 w-36 disabled:bg-[#cfcfcf]
+            rounded-xl mt-2 p-2 w-36 mb-6 disabled:bg-[#cfcfcf]
             disabled:cursor-not-allowed"
         >
           {mutation.isPending ? "Loading..." : "Send"}
         </button>
-        {"Progress: " + progress}
       </form>
     </div>
   );
