@@ -14,6 +14,7 @@ const WritePage = () => {
   const [cover, setCover] = useState("");
   const [img, setImg] = useState("");
   const [video, setVideo] = useState("");
+  const [audio, setAudio] = useState("");
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { getToken } = useAuth();
@@ -30,6 +31,12 @@ const WritePage = () => {
     }
   }, [video]);
 
+  useEffect(() => {
+    if (audio?.url) {
+      setValue(prev => prev + `<p><audio controls src="${audio.url}"></audio></p>`);
+    }
+  }, [audio]);
+  
   const mutation = useMutation({
     mutationFn: async ({ data }) => {
       const token = await getToken();
@@ -101,7 +108,7 @@ const WritePage = () => {
   const formats = [
     "header", "font", "size", "bold", "italic", "underline", "strike",
     "blockquote", "list", "bullet", "indent", "link", "image", "color",
-    "code-block", "video", "script"
+    "code-block", "video", "audio", "script"
   ];
 
   return (
@@ -187,6 +194,9 @@ const WritePage = () => {
           </Upload> 
           <Upload type="video" setData={setVideo}>
             ▶️
+          </Upload>
+          <Upload type="audio" setData={setAudio}>
+            🎵
           </Upload>
         </div>
 
