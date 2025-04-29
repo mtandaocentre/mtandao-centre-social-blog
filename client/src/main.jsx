@@ -21,6 +21,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 import ProfilePage from './routes/ProfilePage.jsx'
 import EditProfilePage from './routes/EditProfilePage.jsx';  // Add this import
+import EditPostPage from './routes/EditPostPage.jsx'
 
 const queryClient = new QueryClient()
 
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
       {
         path: "/profile/edit",  // Add this new route
         element: <EditProfilePage />  // This will show the Edit Profile Page
+      },
+      {
+        path: "/post/edit/:slug",
+        element: <EditPostPage />
       }
     ]
   }
