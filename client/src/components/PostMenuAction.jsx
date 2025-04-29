@@ -115,6 +115,10 @@ const PostMenuAction = ({post}) => {
         saveMutation.mutate();
     }
 
+    const handleEdit = () => {
+        navigate(`/post/edit/${post.slug}`);  // Use the slug here
+    }    
+    
   return (
     <div className=''>
         {/* - Add Action Title 
@@ -156,6 +160,24 @@ const PostMenuAction = ({post}) => {
             {saveMutation.isPending && (
                 <span className="text-xs">(Working...)</span>
             )}
+            </div>
+        )}
+
+        {user && (post.user.username === user.username || isAdmin) && (
+            <div 
+                className="flex items-center gap-2 py-2 text-sm cursor-pointer"
+                onClick={handleEdit}
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    width="20px"
+                    height="20px"
+                >
+                    <path d="M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.41l-2.34-2.34a1.003 1.003 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+                <span>Edit this Post</span>
             </div>
         )}
 
