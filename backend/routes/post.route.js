@@ -3,6 +3,7 @@ import {
     getPosts, 
     getPost, 
     createPost,
+    updatePost,
     deletePost,
     uploadAuth,
     featurePost,
@@ -25,6 +26,9 @@ router.get("/:slug", getPost);
 
 // create post method end point and use createPost from post.conroller to create a post
 router.post("/", createPost);
+
+// update post
+router.put("/:slug", updatePost);
 
 // create delete method end point and use deletePost from post.conroller to delete a post
 router.delete("/:id", deletePost);
