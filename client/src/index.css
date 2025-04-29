@@ -84,3 +84,15 @@ code {
         overflow: hidden;
     }
 }
+
+.custom-quill .ql-editor {
+    min-height: 200px; /* Set minimum height */
+    max-height: 300px; /* Set maximum height */
+    overflow-y: auto;  /* Make it scrollable */
+}
+
+.custom-quill .ql-container {
+    min-height: 200px; /* Prevents container from stretching too high */
+    max-height: 300px; /* Same max-height for consistency */
+    overflow-y: auto;  /* Allows scrolling */
+}
