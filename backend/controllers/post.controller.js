@@ -168,6 +168,45 @@ export const createPost = async (req, res) => {
 };
 
 // ---------------------
+// UPDATE POST
+// ---------------------
+export const updatePost = async (req, res) => {
+  try {
+    const clerkUserId = req.auth.userId;
+    if (!clerkUserId) return res.status(401).json("Not authenticated!");
+
+    const { slug } = req.params; // <-- Use slug, not id
+    const updates = req.body;
+
+    const role = req.auth.sessionClaims?.metadata?.role || "user";
+
+    // Find the post by slug
+    const post = await Post.findOne({ slug });
+    if (!post) return res.status(404).json("Post not found!");
+
+    // If not admin, check if the post belongs to the user
+    if (role !== "admin") {
+      const user = await User.findOne({ clerkUserId });
+      if (!user) return res.status(404).json("User not found!");
+      if (post.user.toString() !== user._id.toString()) {
+        return res.status(403).json("You can update only your own posts!");
+      }
+    }
+
+    // Update the post
+    const updatedPost = await Post.findOneAndUpdate(
+      { slug },
+      { $set: updates },
+      { new: true }
+    );
+
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ---------------------
 // DELETE POST
 // ---------------------
 export const deletePost = async (req, res) => {
