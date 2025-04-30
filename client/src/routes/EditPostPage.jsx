@@ -1,7 +1,7 @@
 import { useAuth, useUser } from "@clerk/clerk-react";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -10,43 +10,47 @@ import Upload from "../components/Upload";
 
 const EditPostPage = () => {
   const { isLoaded, isSignedIn } = useUser();
-  const { slug } = useParams(); // Change from 'id' to 'slug'
+  const { slug } = useParams();
+  const queryClient = useQueryClient();
   const [value, setValue] = useState(null);
-  const [cover, setCover] = useState("");
+  const [cover, setCover] = useState(null);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [desc, setDesc] = useState("");
   const [img, setImg] = useState("");
+  const [imageLoading, setImageLoading] = useState(true);
   const [video, setVideo] = useState("");
   const [audio, setAudio] = useState("");
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { getToken } = useAuth();
 
-  const { data: postData, isLoading: postLoading } = useQuery({
-    queryKey: ["post", slug],  // Use slug here instead of id
+  const { data: postData, isLoading: postLoading, error: postError } = useQuery({
+    queryKey: ["post", slug],
     queryFn: async () => {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${slug}`); // Use slug in the API call
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
       return response.data;
     },
-    enabled: !!slug,  // Ensure query is enabled when slug is available
-  });  
+    enabled: !!slug,
+  });
 
   useEffect(() => {
     if (postData) {
-      console.log(postData.content);
-      const imageUrl = `${import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT}${postData.img}`;
-      setCover({ url: imageUrl, filePath: postData.img });
-      setTitle(postData.title);
-      setCategory(postData.category);
-      setDesc(postData.desc);
-  
-      // Set the fetched content without fallback
-      if (postData?.content) {
-        setValue(postData.content);
+      setTitle(postData.title || "");
+      setCategory(postData.category || "");
+      setDesc(postData.desc || "");
+      setValue(postData.content || "");
+      
+      if (postData.img) {
+        setCover({
+          url: `${import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT}${postData.img}`,
+          filePath: postData.img
+        });
+      } else {
+        setCover(null);
       }
     }
-  }, [postData]);  
+  }, [postData]);
     
   useEffect(() => {
     if (img?.url) {
@@ -67,20 +71,68 @@ const EditPostPage = () => {
   }, [audio]);
 
   const mutation = useMutation({
-    mutationFn: async ({ data }) => {
-        const token = await getToken();
-        const updateResponse = await axios.put(`${import.meta.env.VITE_API_URL}/posts/${slug}`, data, {
-          headers: { Authorization: `Bearer ${token}` },
+    mutationFn: async (postData) => {
+      const token = await getToken();
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/posts/${slug}`,
+        {
+          title: postData.title,
+          category: postData.category,
+          desc: postData.desc,
+          content: postData.content,
+          img: postData.cover?.filePath || null
+        },
+        { 
+          headers: { Authorization: `Bearer ${token}` } 
+        }
+      );
+      return response.data;
+    },
+    onMutate: async (newPostData) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries(['post', slug]);
+
+      // Snapshot the previous value
+      const previousPost = queryClient.getQueryData(['post', slug]);
+
+      // Optimistically update the local state
+      queryClient.setQueryData(['post', slug], (old) => ({
+        ...old,
+        title: newPostData.title,
+        category: newPostData.category,
+        desc: newPostData.desc,
+        content: newPostData.content,
+        img: newPostData.cover?.filePath || old.img
+      }));
+
+      // Update local state immediately
+      setTitle(newPostData.title);
+      setCategory(newPostData.category);
+      setDesc(newPostData.desc);
+      setValue(newPostData.content);
+      
+      if (newPostData.cover?.filePath) {
+        setCover({
+          url: `${import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT}${newPostData.cover.filePath}?${Date.now()}`,
+          filePath: newPostData.cover.filePath
         });
-        return updateResponse;
+      } else {
+        setCover(null);
+      }
+
+      return { previousPost };
     },
-    onSuccess: (updateResponse) => {
-      toast.success("Your post has been updated successfully!");
-      navigate(`/${updateResponse.data.slug}`);
+    onError: (error, variables, context) => {
+      // Rollback to previous state on error
+      queryClient.setQueryData(['post', slug], context.previousPost);
+      toast.error("Failed to update post!");
+      console.error("Update error:", error);
     },
-    onError: (error) => {
-      toast.error("Something went wrong!");
-      console.error(error);
+    onSuccess: (data) => {
+      // Final update with server response
+      queryClient.setQueryData(['post', slug], data);
+      toast.success("Post updated successfully!");
+      navigate(`/${data.slug || slug}`);
     },
   });
 
@@ -90,17 +142,13 @@ const EditPostPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const title = title.trim();
-    const category = category.trim();
-    const desc = desc.trim();
-    const content = value.trim();
+    if (mutation.isPending) return;
 
     const newErrors = {};
-    if (!cover?.filePath) newErrors.cover = "Please upload a cover image.";
-    if (!title) newErrors.title = "Title is required.";
-    if (!category) newErrors.category = "Category is required.";
-    if (!desc) newErrors.desc = "Description is required.";
-    if (!content) newErrors.content = "Content cannot be empty.";
+    if (title.trim() === "") newErrors.title = "Title cannot be empty.";
+    if (category.trim() === "") newErrors.category = "Category cannot be empty.";
+    if (desc.trim() === "") newErrors.desc = "Description cannot be empty.";
+    if (!value || value.trim() === "") newErrors.content = "Content cannot be empty.";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -108,15 +156,14 @@ const EditPostPage = () => {
     }
 
     setErrors({});
-    const data = {
-      img: cover.filePath,
-      title,
-      category,
-      desc,
-      content,
-    };
 
-    mutation.mutate({ data });
+    mutation.mutate({ 
+      title: title.trim(),
+      category: category.trim(),
+      desc: desc.trim(),
+      content: value.trim(),
+      cover
+    });
   };
 
   const modules = {
@@ -146,19 +193,44 @@ const EditPostPage = () => {
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
 
         {/* Cover Image */}
-        <Upload type="image" setData={setCover}>
-          <button className="w-max p-2 shadow-md rounded-xl text-sm text-[#1b1c1c] bg-[#a3a3a3]">
+        <Upload 
+          type="image" 
+          setData={(newCover) => {
+            setImageLoading(true); // Reset loading state when new image is selected
+            setCover(newCover);
+          }}
+        >
+          <button 
+            type="button"
+            className="w-max p-2 shadow-md rounded-xl text-sm text-[#1b1c1c] bg-[#a3a3a3]"
+          >
             Change Cover Image
           </button>
         </Upload>
         {errors.cover && <span className="text-red-500 text-sm">{errors.cover}</span>}
 
+        {/* Updated image display */}
         {cover?.url && (
-          <img
-            src={cover.url}
-            alt="Cover Preview"
-            className="w-40 h-auto object-contain rounded-xl shadow-md"
-          />
+          <div className="w-full relative" style={{ maxWidth: '300px' }}>
+            <img
+              src={cover.url}
+              alt="Cover Preview"
+              className={`rounded-xl shadow-md ${imageLoading ? 'invisible' : 'visible'}`}
+              style={{ 
+                width: '100%',
+                height: 'auto',
+                display: 'block'
+              }}
+              onLoad={() => setImageLoading(false)}
+              onError={() => {
+                setImageLoading(false);
+                toast.error("Failed to load cover image");
+              }}
+            />
+            {imageLoading && (
+              <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-xl"></div>
+            )}
+          </div>
         )}
 
         {/* Title */}
@@ -192,7 +264,6 @@ const EditPostPage = () => {
             <option value="software">Software</option>
             <option value="web">Web</option>
          </select>
-
         </div>
         {errors.category && <span className="text-red-500 text-sm">{errors.category}</span>}
 
@@ -206,46 +277,59 @@ const EditPostPage = () => {
         />
         {errors.desc && <span className="text-red-500 text-sm">{errors.desc}</span>}
 
-        {/* Editor */}
-        <div className="flex flex-col gap-2 flex-grow">
-            {postLoading || value === null ? (
-                <div>Loading Editor...</div>
-            ) : (
-                <ReactQuill
-                    theme="snow"
-                    className="rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md custom-quill"
-                    value={value}
-                    onChange={setValue}
-                    modules={modules}
-                    formats={formats}
-                    readOnly={mutation.isPending}
-                />
-            )}
-            {errors.content && <span className="text-red-500 text-sm">{errors.content}</span>}
+        {/* Editor with fixed height */}
+        <div className="flex flex-col gap-2 h-70"> {/* Changed from flex-grow to fixed height */}
+          {postLoading || value === null ? (
+            <div>Loading Editor...</div>
+          ) : (
+            <ReactQuill
+              theme="snow"
+              className="rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md h-full"
+              value={value}
+              onChange={setValue}
+              modules={modules}
+              formats={formats}
+              readOnly={mutation.isPending}
+            />
+          )}
+          {errors.content && <span className="text-red-500 text-sm">{errors.content}</span>}
         </div>
 
-        {/* Uploads */}
-        <div className="flex gap-4 flex-shrink-0">
-            <Upload type="image" setData={setImg}>
-                🌆
-            </Upload>
-            <Upload type="video" setData={setVideo}>
-                ▶️
-            </Upload>
-            <Upload type="audio" setData={setAudio}>
-                🎵
-            </Upload>
+        {/* Upload buttons - moved outside editor container */}
+        <div className="flex gap-4 flex-shrink-0 mt-8"> {/* Added margin-top */}
+          <Upload type="image" setData={setImg}>
+            🌆
+          </Upload>
+          <Upload type="video" setData={setVideo}>
+            ▶️
+          </Upload>
+          <Upload type="audio" setData={setAudio}>
+            🎵
+          </Upload>
         </div>
 
-        {/* Submit */}
-        <button
-          disabled={mutation.isPending}
-          className="text-[#1b1c1c] bg-[#a3a3a3] font-medium
-            rounded-xl mt-2 p-2 w-36 mb-6 disabled:bg-[#cfcfcf]
-            disabled:cursor-not-allowed"
-        >
-          {mutation.isPending ? "Saving..." : "Update"}
-        </button>
+        {/* Submit & Cancel Buttons */}
+        <div className="flex gap-4 mb-8 mt-4"> {/* Added margin-top */}
+          <button
+            type="submit"
+            disabled={mutation.isPending}
+            className={`text-white p-2 rounded-md w-36 shadow-md ${
+              mutation.isPending
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
+          >
+            {mutation.isPending ? "Saving..." : "Update"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate(`/${slug}`)}
+            className="text-gray-600 border p-2 rounded-md w-36"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );
