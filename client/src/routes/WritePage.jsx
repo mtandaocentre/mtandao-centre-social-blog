@@ -15,6 +15,7 @@ const WritePage = () => {
   const [img, setImg] = useState("");
   const [video, setVideo] = useState("");
   const [audio, setAudio] = useState("");
+  const [imageLoading, setImageLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { getToken } = useAuth();
@@ -111,25 +112,51 @@ const WritePage = () => {
     "code-block", "video", "audio", "script"
   ];
 
+  // ... (previous imports remain the same)
+
   return (
-    <div className='h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6'>
+    <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6">
       <h1 className="text-xl font-light">Create a New Article</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
         
         {/* Cover Image */}
-        <Upload type="image" setData={setCover}>
-          <button className="w-max p-2 shadow-md rounded-xl text-sm text-[#1b1c1c] bg-[#a3a3a3]">
+        <Upload 
+          type="image" 
+          setData={(newCover) => {
+            setImageLoading(true);
+            setCover(newCover);
+          }}
+        >
+          <button 
+            type="button"
+            className="w-max p-2 shadow-md rounded-xl text-sm text-[#1b1c1c] bg-[#a3a3a3]"
+          >
             Add a cover image
           </button>
         </Upload>
         {errors.cover && <span className="text-red-500 text-sm">{errors.cover}</span>}
 
         {cover?.url && (
-          <img
-            src={cover.url}
-            alt="Cover Preview"
-            className="w-40 h-auto object-contain rounded-xl shadow-md"
-          />
+          <div className="w-full relative" style={{ maxWidth: '300px' }}>
+            <img
+              src={cover.url}
+              alt="Cover Preview"
+              className={`rounded-xl shadow-md ${imageLoading ? 'invisible' : 'visible'}`}
+              style={{ 
+                width: '100%',
+                height: 'auto',
+                display: 'block'
+              }}
+              onLoad={() => setImageLoading(false)}
+              onError={() => {
+                setImageLoading(false);
+                toast.error("Failed to load cover image");
+              }}
+            />
+            {imageLoading && (
+              <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-xl"></div>
+            )}
+          </div>
         )}
 
         {/* Title */}
@@ -171,11 +198,11 @@ const WritePage = () => {
         {errors.desc && <span className="text-red-500 text-sm">{errors.desc}</span>}
 
         {/* Editor */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 h-70 mb-4 relative">
           <ReactQuill 
             theme="snow" 
-            className="h-[300px] rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md overflow-y-auto"
-            value={value} 
+            className="custom-quill rounded-xl bg-[#e0e0e0] text-[#1b1c1c] shadow-md h-full"
+            value={value || ''}
             onChange={setValue}
             modules={modules}
             formats={formats}
@@ -187,8 +214,8 @@ const WritePage = () => {
           )}
         </div>
 
-        {/* Uploads */}
-        <div className="flex gap-4">
+        {/* Uploads - Increased top margin */}
+        <div className="flex gap-4 flex-shrink-0 mt-4"> {/* Changed from mt-4 to mt-8 */}
           <Upload type="image" setData={setImg}>
             🌆
           </Upload> 
@@ -200,15 +227,20 @@ const WritePage = () => {
           </Upload>
         </div>
 
-        {/* Submit */}
-        <button 
-          disabled={mutation.isPending}
-          className="text-[#1b1c1c] bg-[#a3a3a3] font-medium
-            rounded-xl mt-2 p-2 w-36 mb-6 disabled:bg-[#cfcfcf]
-            disabled:cursor-not-allowed"
-        >
-          {mutation.isPending ? "Loading..." : "Send"}
-        </button>
+        {/* Submit Button */}
+        <div className="flex gap-4 mb-8 mt-4"> {/* Changed from mt-4 to mt-8 */}
+          <button
+            type="submit"
+            disabled={mutation.isPending}
+            className={`text-white p-2 rounded-md w-36 shadow-md ${
+              mutation.isPending
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
+          >
+            {mutation.isPending ? "Loading..." : "Publish"}
+          </button>
+        </div>
       </form>
     </div>
   );
