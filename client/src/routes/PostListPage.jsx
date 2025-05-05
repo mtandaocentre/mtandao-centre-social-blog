@@ -47,7 +47,7 @@ const PostListPage = () => {
 
         {/* Add SideMenu Component */}
         {/* Hide and show menu depending on button state */}
-        <div className={`${open ? "block" : "hidden"} md:block`}>
+        <div className={`${open ? "block" : "hidden"} md:block mb-8`}>
           <SideMenu />
         </div>
       </div>
