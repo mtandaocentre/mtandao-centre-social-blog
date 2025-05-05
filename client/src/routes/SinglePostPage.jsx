@@ -32,6 +32,42 @@ import {
   FaCopy,
 } from "react-icons/fa";
 
+const categories = [
+  { name: "All Posts", path: "/posts" },
+  { name: "AI", path: "/posts?cat=ai" },
+  { name: "AR", path: "/posts?cat=ar" },
+  { name: "Audio", path: "/posts?cat=audio" },
+  { name: "Blockchain", path: "/posts?cat=blockchain" },
+  { name: "Cloud", path: "/posts?cat=cloud" },
+  { name: "Data", path: "/posts?cat=data" },
+  { name: "E-Learning", path: "/posts?cat=e-learning" },
+  { name: "FarmTech", path: "/posts?cat=farmtech" },
+  { name: "FilmTech", path: "/posts?cat=filmtech" },
+  { name: "FoodTech", path: "/posts?cat=foodtech" },
+  { name: "FinTech", path: "/posts?cat=fintech" },
+  { name: "Gaming", path: "/posts?cat=gaming" },
+  { name: "General", path: "/posts?cat=general" },
+  { name: "Graphics", path: "/posts?cat=graphics" },
+  { name: "GreenTech", path: "/posts?cat=greentech" },
+  { name: "Hardware", path: "/posts?cat=hardware" },
+  { name: "HealthTech", path: "/posts?cat=healthtech" },
+  { name: "History", path: "/posts?cat=history" },
+  { name: "IoT", path: "/posts?cat=iot" },
+  { name: "LLM", path: "/posts?cat=llm" },
+  { name: "Mobile", path: "/posts?cat=mobile" },
+  { name: "Music", path: "/posts?cat=music" },
+  { name: "Networks", path: "/posts?cat=networks" },
+  { name: "Programming", path: "/posts?cat=programming" },
+  { name: "Quantum", path: "/posts?cat=quantum" },
+  { name: "Robotics", path: "/posts?cat=robotics" },
+  { name: "Security", path: "/posts?cat=security" },
+  { name: "Software", path: "/posts?cat=software" },
+  { name: "Telecoms", path: "/posts?cat=telecoms" },
+  { name: "UI/UX", path: "/posts?cat=ui/ux" },
+  { name: "Video", path: "/posts?cat=video" },
+  { name: "VR", path: "/posts?cat=vr" },
+  { name: "Web", path: "/posts?cat=web" },
+];
 
 // Transformation function to fix code blocks
 const transformCodeBlocks = (html) => {
@@ -349,18 +385,17 @@ const SinglePostPage = () => {
           </div>
           
           <PostMenuAction post={data} />
+          
+          {/* Categories Section */}
           <h1 className="mt-8 mb-4 text-sm font-medium">Categories</h1>
-          <div className="flex flex-col gap-2 text-sm">
-            <Link className="underline" to="/posts">All Posts</Link>
-            <Link className="underline" to="/posts?cat=aiot">AIoT</Link>
-            <Link className="underline" to="/posts?cat=cloud">Cloud</Link>
-            <Link className="underline" to="/posts?cat=data">Data</Link>
-            <Link className="underline" to="/posts?cat=general">General</Link>
-            <Link className="underline" to="/posts?cat=hardware">Hardware</Link>
-            <Link className="underline" to="/posts?cat=security">Security</Link>
-            <Link className="underline" to="/posts?cat=software">Software</Link>
-            <Link className="underline" to="/posts?cat=web">Web</Link>
+          <div className="flex flex-col gap-2 text-sm h-[300px] overflow-y-hidden hover:overflow-y-auto pr-2 transition-[overflow] duration-300 custom-scrollbar">
+            {categories.map((cat) => (
+              <Link key={cat.path} className="underline hover:text-blue-400 transition-colors" to={cat.path}>
+                {cat.name}
+              </Link>
+            ))}
           </div>
+
           <h1 className="mt-8 mb-4 text-sm font-medium">Search</h1>
           <Search />
         </div>
