@@ -7,6 +7,43 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Upload from "../components/Upload";
+import Select from 'react-select';
+
+// Categories constant moved outside component
+const categories = [
+  { value: 'ai', label: 'AI' },
+  { value: 'ar', label: 'AR' },
+  { value: 'audio', label: 'Audio' },
+  { value: 'blockchain', label: 'Blockchain' },
+  { value: 'cloud', label: 'Cloud' },
+  { value: 'data', label: 'Data' },
+  { value: 'e-learning', label: 'E-Learning' },
+  { value: 'farmtech', label: 'FarmTech' },
+  { value: 'filmtech', label: 'FilmTech' },
+  { value: 'fintech', label: 'FinTech' },
+  { value: 'foodtech', label: 'FoodTech' },
+  { value: 'gaming', label: 'Gaming' },
+  { value: 'graphics', label: 'Graphics' },
+  { value: 'greentech', label: 'GreenTech' },
+  { value: 'hardware', label: 'Hardware' },
+  { value: 'health', label: 'Health' },
+  { value: 'history', label: 'History' },
+  { value: 'iot', label: 'IoT' },
+  { value: 'llm', label: 'LLM' },
+  { value: 'mobile', label: 'Mobile' },
+  { value: 'music', label: 'Music' },
+  { value: 'networks', label: 'Networks' },
+  { value: 'programming', label: 'Programming' },
+  { value: 'quantum', label: 'Quantum' },
+  { value: 'robotics', label: 'Robotics' },
+  { value: 'software', label: 'Software' },
+  { value: 'security', label: 'Security' },
+  { value: 'telecoms', label: 'Telecoms' },
+  { value: 'ui/ux', label: 'UI/UX' },
+  { value: 'vr', label: 'VR' },
+  { value: 'video', label: 'Video' },
+  { value: 'web', label: 'Web' },
+];
 
 const EditPostPage = () => {
   const { isLoaded, isSignedIn } = useUser();
@@ -15,7 +52,7 @@ const EditPostPage = () => {
   const [value, setValue] = useState(null);
   const [cover, setCover] = useState(null);
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [desc, setDesc] = useState("");
   const [img, setImg] = useState("");
   const [imageLoading, setImageLoading] = useState(true);
@@ -35,11 +72,23 @@ const EditPostPage = () => {
   });
 
   useEffect(() => {
+    if (postError) {
+      toast.error("Failed to load post data");
+      console.error("Post loading error:", postError);
+      navigate("/");
+    }
+  }, [postError, navigate]);
+
+  useEffect(() => {
     if (postData) {
       setTitle(postData.title || "");
-      setCategory(postData.category || "");
       setDesc(postData.desc || "");
       setValue(postData.content || "");
+      
+      if (postData.category) {
+        const foundCategory = categories.find(cat => cat.value === postData.category);
+        setSelectedCategory(foundCategory || null);
+      }
       
       if (postData.img) {
         setCover({
@@ -51,7 +100,7 @@ const EditPostPage = () => {
       }
     }
   }, [postData]);
-    
+
   useEffect(() => {
     if (img?.url) {
       setValue((prev) => prev + `<p><img src="${img.url}" alt="content image"/></p>`);
@@ -89,13 +138,9 @@ const EditPostPage = () => {
       return response.data;
     },
     onMutate: async (newPostData) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries(['post', slug]);
-
-      // Snapshot the previous value
       const previousPost = queryClient.getQueryData(['post', slug]);
 
-      // Optimistically update the local state
       queryClient.setQueryData(['post', slug], (old) => ({
         ...old,
         title: newPostData.title,
@@ -105,9 +150,8 @@ const EditPostPage = () => {
         img: newPostData.cover?.filePath || old.img
       }));
 
-      // Update local state immediately
       setTitle(newPostData.title);
-      setCategory(newPostData.category);
+      setSelectedCategory(categories.find(cat => cat.value === newPostData.category) || null);
       setDesc(newPostData.desc);
       setValue(newPostData.content);
       
@@ -123,21 +167,16 @@ const EditPostPage = () => {
       return { previousPost };
     },
     onError: (error, variables, context) => {
-      // Rollback to previous state on error
       queryClient.setQueryData(['post', slug], context.previousPost);
       toast.error("Failed to update post!");
       console.error("Update error:", error);
     },
     onSuccess: (data) => {
-      // Final update with server response
       queryClient.setQueryData(['post', slug], data);
       toast.success("Post updated successfully!");
       navigate(`/${data.slug || slug}`);
     },
   });
-
-  if (!isLoaded || postLoading) return <div>Loading...</div>;
-  if (!isSignedIn) return <div>Sign in to access this page.</div>;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -146,7 +185,7 @@ const EditPostPage = () => {
 
     const newErrors = {};
     if (title.trim() === "") newErrors.title = "Title cannot be empty.";
-    if (category.trim() === "") newErrors.category = "Category cannot be empty.";
+    if (!selectedCategory) newErrors.category = "Category cannot be empty.";
     if (desc.trim() === "") newErrors.desc = "Description cannot be empty.";
     if (!value || value.trim() === "") newErrors.content = "Content cannot be empty.";
 
@@ -159,7 +198,7 @@ const EditPostPage = () => {
 
     mutation.mutate({ 
       title: title.trim(),
-      category: category.trim(),
+      category: selectedCategory.value,
       desc: desc.trim(),
       content: value.trim(),
       cover
@@ -187,6 +226,10 @@ const EditPostPage = () => {
     "code-block", "video", "audio", "script"
   ];
 
+  if (!isLoaded || postLoading) return <div>Loading...</div>;
+  if (!isSignedIn) return <div>Sign in to access this page.</div>;
+  if (postError) return <div>Error loading post. Please try again.</div>;
+
   return (
     <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6">
       <h1 className="text-xl font-light">Edit Your Article</h1>
@@ -196,7 +239,7 @@ const EditPostPage = () => {
         <Upload 
           type="image" 
           setData={(newCover) => {
-            setImageLoading(true); // Reset loading state when new image is selected
+            setImageLoading(true);
             setCover(newCover);
           }}
         >
@@ -209,7 +252,6 @@ const EditPostPage = () => {
         </Upload>
         {errors.cover && <span className="text-red-500 text-sm">{errors.cover}</span>}
 
-        {/* Updated image display */}
         {cover?.url && (
           <div className="w-full relative" style={{ maxWidth: '300px' }}>
             <img
@@ -246,24 +288,61 @@ const EditPostPage = () => {
 
         {/* Category */}
         <div className="flex items-center gap-4">
-          <label htmlFor="category" className="text-sm">Category:</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            name="category"
-            id="category"
-            className="p-2 rounded-xl bg-[#a3a3a3] text-[#1b1c1c] shadow-md"
-          >
-            <option value="">-- Select --</option>
-            <option value="general">General</option>
-            <option value="aiot">AIoT</option>
-            <option value="cloud">Cloud</option>
-            <option value="data">Data</option>
-            <option value="hardware">Hardware</option>
-            <option value="security">Security</option>
-            <option value="software">Software</option>
-            <option value="web">Web</option>
-         </select>
+          <Select
+            value={selectedCategory}
+            options={categories}
+            placeholder="Select a category"
+            className="w-56"
+            menuPlacement="auto"
+            menuPosition="fixed"
+            menuShouldScrollIntoView={false}
+            styles={{
+              menu: (provided) => ({
+                ...provided,
+                maxHeight: '200px',
+              }),
+              control: (provided) => ({
+                ...provided,
+                backgroundColor: '#a3a3a3',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '2px 4px',
+                minHeight: 'auto',
+                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+              }),
+              placeholder: (provided) => ({
+                ...provided,
+                color: '#1b1c1c'
+              }),
+              valueContainer: (provided) => ({
+                ...provided,
+                padding: '0 6px',
+              }),
+              dropdownIndicator: (provided) => ({
+                ...provided,
+                padding: '4px 8px',
+                color: '#1b1c1c',
+                '&:hover': {
+                  color: '#1b1c1c',
+                },
+              }),
+              indicatorSeparator: (provided) => ({
+                ...provided,
+                display: 'block',
+                backgroundColor: '#1b1c1c',
+                width: '1px',
+                margin: '4px 0',
+              }),
+              option: (provided, state) => ({
+                ...provided,
+                backgroundColor: state.isSelected ? '#a3a3a3' : 'white',
+                color: state.isSelected ? 'white' : '#1b1c1c',
+              }),
+            }}
+            onChange={(selectedOption) => {
+              setSelectedCategory(selectedOption);
+            }}
+          />
         </div>
         {errors.category && <span className="text-red-500 text-sm">{errors.category}</span>}
 
@@ -277,8 +356,8 @@ const EditPostPage = () => {
         />
         {errors.desc && <span className="text-red-500 text-sm">{errors.desc}</span>}
 
-        {/* Editor with fixed height */}
-        <div className="flex flex-col gap-2 h-70"> {/* Changed from flex-grow to fixed height */}
+        {/* Editor */}
+        <div className="flex flex-col gap-2 h-70">
           {postLoading || value === null ? (
             <div>Loading Editor...</div>
           ) : (
@@ -295,8 +374,8 @@ const EditPostPage = () => {
           {errors.content && <span className="text-red-500 text-sm">{errors.content}</span>}
         </div>
 
-        {/* Upload buttons - moved outside editor container */}
-        <div className="flex gap-4 flex-shrink-0 mt-8"> {/* Added margin-top */}
+        {/* Upload buttons */}
+        <div className="flex gap-4 flex-shrink-0 mt-8">
           <Upload type="image" setData={setImg}>
             🌆
           </Upload>
@@ -309,7 +388,7 @@ const EditPostPage = () => {
         </div>
 
         {/* Submit & Cancel Buttons */}
-        <div className="flex gap-4 mb-8 mt-4"> {/* Added margin-top */}
+        <div className="flex gap-4 mb-8 mt-4">
           <button
             type="submit"
             disabled={mutation.isPending}
