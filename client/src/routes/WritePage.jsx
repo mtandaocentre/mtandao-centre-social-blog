@@ -7,11 +7,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify";
 import Upload from "../components/Upload";
+import Select from 'react-select';
 
 const WritePage = () => {
   const { isLoaded, isSignedIn } = useUser();
   const [value, setValue] = useState("");
   const [cover, setCover] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [img, setImg] = useState("");
   const [video, setVideo] = useState("");
   const [audio, setAudio] = useState("");
@@ -63,31 +65,30 @@ const WritePage = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const title = formData.get("title")?.trim();
-    const category = formData.get("category")?.trim();
     const desc = formData.get("desc")?.trim();
     const content = value?.trim();
-
+  
     const newErrors = {};
     if (!cover?.filePath) newErrors.cover = "Please upload a cover image.";
     if (!title) newErrors.title = "Title is required.";
-    if (!category) newErrors.category = "Category is required.";
+    if (!selectedCategory) newErrors.category = "Category is required.";
     if (!desc) newErrors.desc = "Description is required.";
     if (!content) newErrors.content = "Content cannot be empty.";
-
+  
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
+  
     setErrors({});
     const data = {
       img: cover.filePath,
       title,
-      category,
+      category: selectedCategory.value, // Use the selected category's value
       desc,
       content,
     };
-
+  
     mutation.mutate({ data });
   };
 
@@ -112,7 +113,41 @@ const WritePage = () => {
     "code-block", "video", "audio", "script"
   ];
 
-  // ... (previous imports remain the same)
+  // In your component:
+  const categories = [
+    { value: 'ai', label: 'AI' },
+    { value: 'ar', label: 'AR' },
+    { value: 'audio', label: 'Audio' },
+    { value: 'blockchain', label: 'Blockchain' },
+    { value: 'cloud', label: 'Cloud' },
+    { value: 'data', label: 'Data' },
+    { value: 'e-learning', label: 'E-Leraning' },
+    { value: 'farmtech', label: 'FarmTech' },
+    { value: 'filmtech', label: 'FilmTech' },
+    { value: 'fintech', label: 'fintech' },
+    { value: 'foodtech', label: 'FoodTech' },
+    { value: 'gaming', label: 'Gaming' },
+    { value: 'graphics', label: 'Graphics' },
+    { value: 'greentech', label: 'GreenTech' },
+    { value: 'hardware', label: 'Hardware' },
+    { value: 'health', label: 'Health' },
+    { value: 'history', label: 'History' },
+    { value: 'iot', label: 'IoT' },
+    { value: 'llm', label: 'LLM' },
+    { value: 'mobile', label: 'Mobile' },
+    { value: 'music', label: 'Music' },
+    { value: 'networks', label: 'Networks' },
+    { value: 'programming', label: 'Programming' },
+    { value: 'quantum', label: 'Quantum' },
+    { value: 'robotics', label: 'Robotics' },
+    { value: 'software', label: 'Software' },
+    { value: 'security', label: 'Security' },
+    { value: 'Telecoms', label: 'Telecoms' },
+    { value: 'ui/ux', label: 'UI/UX' },
+    { value: 'vr', label: 'vr' },
+    { value: 'video', label: 'video' },
+    { value: 'web', label: 'Web' },
+  ];
 
   return (
     <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6">
@@ -163,29 +198,68 @@ const WritePage = () => {
         <input 
           className="text-4xl font-semibold bg-transparent outline-none" 
           type="text" 
-          placeholder="Add a Title to Your Article" 
+          placeholder="Your Post Title"
           name="title"
         />
         {errors.title && <span className="text-red-500 text-sm">{errors.title}</span>}
 
         {/* Category */}
         <div className="flex items-center gap-4">
-          <label htmlFor="category" className="text-sm">Choose a category:</label>
-          <select 
-            name="category" 
-            id="category"
-            className="p-2 rounded-xl bg-[#a3a3a3] text-[#1b1c1c] shadow-md"
-          >
-            <option value="">-- Select --</option>
-            <option value="general">General</option>
-            <option value="aiot">AIoT</option>
-            <option value="cloud">Cloud</option>
-            <option value="data">Data</option>
-            <option value="hardware">Hardware</option>
-            <option value="security">Security</option>
-            <option value="software">Software</option>
-            <option value="web">Web</option>
-          </select>
+          <Select
+           value={selectedCategory}
+            options={categories}
+            placeholder="Select a category"
+            className="w-56"
+            menuPlacement="auto"
+            menuPosition="fixed"
+            menuShouldScrollIntoView={false}
+            styles={{
+              menu: (provided) => ({
+                ...provided,
+                maxHeight: '200px',
+              }),
+              control: (provided) => ({
+                ...provided,
+                backgroundColor: '#a3a3a3',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '2px 4px',
+                minHeight: 'auto',
+                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+              }),
+              placeholder: (provided) => ({
+                ...provided,
+                color: '#1b1c1c'
+              }),
+              valueContainer: (provided) => ({
+                ...provided,
+                padding: '0 6px',
+              }),
+              dropdownIndicator: (provided) => ({
+                ...provided,
+                padding: '4px 8px', // Added more horizontal padding
+                color: '#1b1c1c',
+                '&:hover': {
+                  color: '#1b1c1c',
+                },
+              }),
+              indicatorSeparator: (provided) => ({
+                ...provided,
+                display: 'block', // Changed from 'none' to 'block'
+                backgroundColor: '#1b1c1c',
+                width: '1px',
+                margin: '4px 0', // Adjust vertical spacing
+              }),
+              option: (provided, state) => ({
+                ...provided,
+                backgroundColor: state.isSelected ? '#a3a3a3' : 'white',
+                color: state.isSelected ? 'white' : '#1b1c1c',
+              }),
+            }}
+            onChange={(selectedOption) => {
+              setSelectedCategory(selectedOption);
+            }}
+          />
         </div>
         {errors.category && <span className="text-red-500 text-sm">{errors.category}</span>}
 
